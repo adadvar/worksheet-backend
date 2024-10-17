@@ -211,7 +211,8 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             'uploadFile'
         ])->name('worksheet.upload.file');
 
-        $router->post('/update/{worksheet}', [
+
+        $router->put('/{worksheet}', [
             WorksheetController::class,
             'update'
         ])->name('worksheet.update');

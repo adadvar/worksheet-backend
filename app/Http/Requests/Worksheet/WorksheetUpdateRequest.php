@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Worksheet;
 
 use App\Rules\CanChangeAdvertState;
+use App\Rules\UploadedBannerWorksheetId;
+use App\Rules\UploadedFileWorksheetId;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
@@ -27,18 +29,13 @@ class WorksheetUpdateRequest extends FormRequest
     {
         return [
             'category_id' => 'nullable|exists:categories,id',
-            'city_id' => 'nullable|exists:cities,id',
-            'title' => 'nullable|string|max:100',
-            'slug' => 'nullable|string|unique:adverts,slug|max:10',
-            'slug_url' => 'nullable|string|unique:adverts,slug_url|max:100',
-            'info' => 'nullable|string',
-            'lat' => 'nullable|string',
-            'long' => 'nullable|string',
+            'name' => 'nullable|string|max:100',
+            'slug' => 'nullable|string|unique:worksheets,slug|max:100',
+            'description' => 'nullable|string',
             'price' => 'nullable|numeric|gt:0',
-            'images' => 'nullable|array|max:1024',
+            'banner' => ['nullable', new UploadedBannerWorksheetId()],
+            'file' => ['nullable', new UploadedFileWorksheetId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
-            'state' => ['nullable', new CanChangeAdvertState($this->advert)],
-            'content' => 'nullable|array'
         ];
     }
 }

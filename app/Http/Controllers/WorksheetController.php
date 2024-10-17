@@ -84,13 +84,15 @@ class WorksheetController extends Controller
     {
         try {
             $banner = $r->file('banner');
-            // $arr = [];
-            // foreach ($banners as $banner) {
+
             $bannerName = time() . Str::random(10) . '-banner.' . $banner->getClientOriginalExtension();
             Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
-            // $arr[] = $bannerName;
-            // }
-            // dd($arr);
+
+            DB::table('temporary_files')->insert([
+                'file_name' => $bannerName,
+                'created_at' => now(),
+            ]);
+
             return response([
                 'banner' => $bannerName
             ], 200);
@@ -105,6 +107,12 @@ class WorksheetController extends Controller
             $file = $r->file('file');
             $fileName = time() . Str::random(10) . '-file.' . $file->getClientOriginalExtension();
             Storage::putFileAs('worksheets/tmp', $file, $fileName);
+
+            DB::table('temporary_files')->insert([
+                'file_name' => $fileName,
+                'created_at' => now(),
+            ]);
+
             return response([
                 'file' => $fileName
             ], 200);
@@ -154,12 +162,16 @@ class WorksheetController extends Controller
                 $bannerName = $r->banner;
                 Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
                 $worksheet->banner = $bannerName;
+
+                DB::table('temporary_files')->where('file_name', $bannerName)->delete();
             }
 
             if ($r->has('file')) {
                 $fileName = $r->file;
                 Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
                 $worksheet->file = $fileName;
+
+                DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
             $worksheet->save();
@@ -195,6 +207,11 @@ class WorksheetController extends Controller
                     Storage::delete('worksheets/' . $worksheet->file);
                 }
                 Storage::move('worksheets/tmp/' . $data['file'], 'worksheets/' . $data['file']);
+            }
+
+            if (!$r->slug) {
+                $slug = Str::slug($r->name);
+                $data['slug'] = $slug;
             }
 
             $worksheet->update($data);
