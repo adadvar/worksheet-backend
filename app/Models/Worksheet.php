@@ -10,18 +10,13 @@ class Worksheet extends Model
     use HasFactory;
 
     protected $table = 'worksheets';
-    protected $fillable = ['category_id', 'level_id', 'name', 'slug', 'description', 'price', 'file_path'];
+    protected $fillable = ['category_id', 'name', 'slug', 'description', 'price', 'banner', 'file', 'publish_at'];
 
     protected $appends = ['age'];
 
-    protected $casts = [
-        'images' => 'array',
-    ];
-
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
+    // protected $casts = [
+    // 'banners' => 'array',
+    // ];
 
     public function orderItems()
     {

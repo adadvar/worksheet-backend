@@ -2,11 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Worksheet\UploadWorksheetBannersRequest;
+use App\Http\Requests\Worksheet\UploadWorksheetFileRequest;
 use Illuminate\Support\Str;
 use App\Http\Requests\Worksheet\WorksheetCreateRequest;
+use App\Http\Requests\Worksheet\WorksheetDeleteRequest;
+use App\Http\Requests\Worksheet\WorksheetUpdateRequest;
 use App\Models\Category;
+use App\Models\Worksheet;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -44,110 +50,170 @@ class WorksheetController extends Controller
             $whereIns['category_id'] = $ids;
         }
 
-        $query = Advert::query();
+        $query = Worksheet::query();
 
         $query->where($conditions);
         foreach ($whereIns as $column => $values) {
             $query->whereIn($column, $values);
         }
 
-        $query->with(['user', 'category']);
+        $query->with(['category']);
 
         if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
         if ($r->o == 'pa') $query->orderBy('price', 'asc');
         if ($r->o == 'pd') $query->orderBy('price', 'desc');
 
         $perPage = $r->per_page ?? 10;
-        $adverts = $query->paginate($perPage);
+        $worksheets = $query->paginate($perPage);
 
-        return response($adverts);
+        return response($worksheets);
     }
 
     public function show(Request $r)
     {
-        $advert = Advert::where('slug_url', $r->id_slug)
+        $worksheet = Worksheet::where('slug_url', $r->id_slug)
             ->orWhere('id', $r->id_slug)
             ->where('state', 'accepted')
             ->firstOrFail();
-        event(new VisitAdvert($advert));
-        $advert = $advert->load('user', 'category');
-        return $advert;
+        // event(new VisitWorksheet($worksheet));
+        $worksheet = $worksheet->load('user', 'category');
+        return $worksheet;
+    }
+
+    public static function uploadBanner(UploadWorksheetBannersRequest $r)
+    {
+        try {
+            $banner = $r->file('banner');
+            // $arr = [];
+            // foreach ($banners as $banner) {
+            $bannerName = time() . Str::random(10) . '-banner.' . $banner->getClientOriginalExtension();
+            Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
+            // $arr[] = $bannerName;
+            // }
+            // dd($arr);
+            return response([
+                'banner' => $bannerName
+            ], 200);
+        } catch (Exception $e) {
+            return response(['message' => 'An error has occurred !'], 500);
+        }
+    }
+
+    public static function uploadFile(UploadWorksheetFileRequest $r)
+    {
+        try {
+            $file = $r->file('file');
+            $fileName = time() . Str::random(10) . '-file.' . $file->getClientOriginalExtension();
+            Storage::putFileAs('worksheets/tmp', $file, $fileName);
+            return response([
+                'file' => $fileName
+            ], 200);
+        } catch (Exception $e) {
+            return response(['message' => 'An error has occurred !'], 500);
+        }
     }
 
     public function create(WorksheetCreateRequest $r)
     {
         try {
+            DB::beginTransaction();
+
             $user = auth()->user();
             $data = $r->validated();
             // $data['user_id'] = $user->id;
             $category = $r->category;
             $data['category_id'] = $category->id;
-            $imageArr = [];
-            if (!empty($r->file('images'))) {
-                foreach ($r->file('images') as $file) {
-                    $image = $file;
-                    $imageName = time() . bin2hex(random_bytes(5)) . '-image';
-                    Storage::disk('worksheets')->put('/' . $imageName, $image->get());
-                    $imageArr[] = $imageName;
-                }
-            }
-            $data['images'] = ($imageArr);
+
+            // $imageArr = [];
+            // if ($r->hasFile('images')) {
+            //     // foreach ($r->file('images') as $file) {
+            //     //     $image = $file;
+            //     $image = $r->file('image');
+            //     $imageName = time() . bin2hex(random_bytes(5)) . '-image';
+            //     Storage::disk('worksheets')->put('/' . $imageName, $image->get());
+            //     $imageArr[] = $imageName;
+            // }
+            // }
+            // $data['images'] = ($imageArr);
             // $slug = bin2hex(random_bytes(5));
-            $slug = Str::slug($r->name);
-            $data['slug'] = $slug;
+
+            if (!$r->slug) {
+                $slug = Str::slug($r->name);
+                $data['slug'] = $slug;
+            }
+            // if ($r->hasFile('file_path')) {
+            //     $file = $r->file('file_path');
+            //     $fileName = time() . bin2hex(random_bytes(5)) . '-file';
+            //     Storage::disk('worksheets')->put('/' . $fileName, $file->get());
+            //     $data['file_path'] = $fileName;
+            // }
+
             $worksheet = $category->worksheets()->create($data);
-            return response($worksheet, 200);
+
+            if ($r->has('banner')) {
+                $bannerName = $r->banner;
+                Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
+                $worksheet->banner = $bannerName;
+            }
+
+            if ($r->has('file')) {
+                $fileName = $r->file;
+                Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
+                $worksheet->file = $fileName;
+            }
+
+            $worksheet->save();
+            DB::commit();
+
+            return response($worksheet, 201);
         } catch (Exception $e) {
+            DB::rollBack();
 
             Log::error($e->getTraceAsString());
             return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 
-    public function update(AdvertUpdateRequest $r)
+    public function update(WorksheetUpdateRequest $r)
     {
-
         try {
+            DB::beginTransaction();
+
             $user = auth()->user();
-            $advert = $r->advert;
-            $category = $advert->category;
             $data = $r->validated();
-            $data['user_id'] = $user->id;
-            $data['category_id'] = $category->id;
-            $imageArr = [];
-            if (!empty($r->file('images'))) {
-                foreach ($r->file('images') as $file) {
-                    $image = $file;
-                    $imageName = time() . bin2hex(random_bytes(5)) . '-image';
-                    Storage::disk('adverts')->put('/' . $user->id . '/' . $imageName, $image->get());
-                    $imageArr[] = $imageName;
+            $worksheet = $r->worksheet;
+
+            if ($r->has('banner')) {
+                if ($worksheet->banner) {
+                    Storage::delete('worksheets/' . $worksheet->banner);
                 }
-            }
-            $data['images'] = ($imageArr);
-            if (isset($r->title) && isset($r->city_id)) {
-                $cat_title = $category->title;
-                $city = City::find($r->city_id);
-                $slug_url = str_replace(' ', '-', env('APP_NAME') . ' ' . $city->name . ' ' . $r->title . ' ' . $cat_title . ' ' . bin2hex(random_bytes(4)));
-                $slug = bin2hex(random_bytes(5));
-                $data['slug'] = $slug;
-                $data['slug_url'] = $slug_url;
+                Storage::move('worksheets/tmp/' . $data['banner'], 'worksheets/' . $data['banner']);
             }
 
+            if ($r->has('file')) {
+                if ($worksheet->file) {
+                    Storage::delete('worksheets/' . $worksheet->file);
+                }
+                Storage::move('worksheets/tmp/' . $data['file'], 'worksheets/' . $data['file']);
+            }
 
-            tap($advert)->update($data);
-            return response($advert, 200);
+            $worksheet->update($data);
+            DB::commit();
+
+            return response($worksheet, 200);
         } catch (Exception $e) {
-            Log::error($e);
+            DB::rollBack();
+            Log::error($e->getTraceAsString());
             return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 
 
-    public function delete(AdvertDeleteRequest $r)
+    public function delete(WorksheetDeleteRequest $r)
     {
         try {
             DB::beginTransaction();
-            $r->advert->delete();
+            $r->worksheet->delete();
             DB::commit();
             return response(['message' => 'با موفقیت حذف شد!'], 200);
         } catch (Exception $e) {

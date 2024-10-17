@@ -29,7 +29,8 @@ class WorksheetPolicy
 
     public function update(User $user, Worksheet $worksheet = null)
     {
-        return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        // return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        return $user->isAdmin();
     }
 
     public function changeState(User $user, Worksheet $worksheet)
@@ -40,7 +41,8 @@ class WorksheetPolicy
 
     public function delete(User $user, Worksheet $worksheet = null)
     {
-        return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        // return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        return $user->isAdmin();
     }
 
     // public function like(User $user = null, Worksheet $worksheet = null)

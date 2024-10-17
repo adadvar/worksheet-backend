@@ -33,7 +33,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('myapptoken')->plainTextToken;
 
-            return response(['user' => $user, 'token' => $token], 201);
+            return response(['user' => $user, 'token' => $token], 200);
         } catch (Exception $exception) {
             Log::error($exception);
             return response(

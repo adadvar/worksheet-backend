@@ -3,10 +3,12 @@
 namespace App\Http\Requests\Worksheet;
 
 use App\Models\Worksheet;
+use App\Rules\UploadedBannerWorksheetId;
+use App\Rules\UploadedFileWorksheetId;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class WorksheetCreateRequest extends FormRequest
+class   WorksheetCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,8 +34,8 @@ class WorksheetCreateRequest extends FormRequest
             'slug' => 'nullable|string|unique:worksheets,slug|max:100',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|gt:0',
-            'image' => 'nullable|array',
-            'file_path' => 'nullable|string',
+            'banner' => ['nullable', new UploadedBannerWorksheetId()],
+            'file' => ['nullable', new UploadedFileWorksheetId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
         ];
     }

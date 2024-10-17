@@ -17,10 +17,10 @@ class Category extends Model
     protected $table = 'categories';
     protected $fillable = ['parent_id', 'name', 'type', 'slug', 'icon', 'banner'];
 
-    public function getRouteKeyName()
-    {
-        return 'slug';
-    }
+    // public function getRouteKeyName()
+    // {
+    //     return 'slug';
+    // }
 
 
     public function worksheets()

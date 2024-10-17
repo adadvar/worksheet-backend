@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Advert;
+namespace App\Http\Requests\Worksheet;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class AdvertDeleteRequest extends FormRequest
+class UploadWorksheetBannersRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +13,8 @@ class AdvertDeleteRequest extends FormRequest
      */
     public function authorize()
     {
-        return Gate::allows('delete', $this->advert);
+        //TODO: must administrator be able
+        return true;
     }
 
     /**
@@ -25,7 +25,7 @@ class AdvertDeleteRequest extends FormRequest
     public function rules()
     {
         return [
-         
+            'banner' => 'required|image|max:1024',
         ];
     }
 }

@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('worksheets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('category_id');
-            $table->unsignedBigInteger('level_id');
+            // $table->unsignedBigInteger('level_id');
             $table->string('name', 100)->nullable();
             $table->string('slug', 100)->nullable();
             $table->text('description')->nullable();
             $table->decimal('price', 15, 2)->nullable();
-            $table->text('images')->nullable();
-            $table->string('file_path')->nullable();
+            $table->string('banner')->nullable();
+            $table->string('file')->nullable();
             $table->timestamp('publish_at')->nullable();
 
             $table->timestamps();
@@ -32,11 +32,11 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->foreign('level_id')
-                ->references('id')
-                ->on('levels')
-                ->onDelete('cascade')
-                ->onUpdate('cascade');
+            // $table->foreign('level_id')
+            //     ->references('id')
+            //     ->on('levels')
+            //     ->onDelete('cascade')
+            //     ->onUpdate('cascade');
         });
     }
 

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Advert;
+namespace App\Http\Requests\Worksheet;
 
 use App\Rules\CanChangeAdvertState;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class AdvertUpdateRequest extends FormRequest
+class WorksheetUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +15,7 @@ class AdvertUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('update', $this->worksheet);
     }
 
     /**

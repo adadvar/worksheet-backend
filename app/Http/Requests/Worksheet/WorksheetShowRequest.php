@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Advert;
+namespace App\Http\Requests\Worksheet;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AdvertListRequest extends FormRequest
+class WorksheetShowRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,6 @@ class AdvertListRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-        ];
+        return [];
     }
 }
