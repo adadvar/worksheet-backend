@@ -29,7 +29,5 @@ class RolesTableSeeder extends Seeder
         foreach ($roles as $roleData) {
             Role::firstOrCreate($roleData);
         }
-
-        $this->command->info('Roles created successfully');
     }
 }

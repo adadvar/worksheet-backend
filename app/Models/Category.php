@@ -38,6 +38,11 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id')->with('child');
     }
 
+    public function parents()
+    {
+        return $this->parent()->with('parents');
+    }
+
     public static function boot()
     {
         parent::boot();

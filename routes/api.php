@@ -168,7 +168,7 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
         'list'
     ])->name('worksheet.list');
 
-    $router->get('/show/{id_slug}', [
+    $router->get('/show/{worksheet}', [
         WorksheetController::class,
         'show'
     ])->name('worksheet.show');
@@ -217,35 +217,35 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             'update'
         ])->name('worksheet.update');
 
-        $router->put('/{worksheet}/state', [
-            WorksheetController::class,
-            'changeState'
-        ])->name('worksheet.change.state');
+        // $router->put('/{worksheet}/state', [
+        //     WorksheetController::class,
+        //     'changeState'
+        // ])->name('worksheet.change.state');
 
         $router->delete('/{worksheet}', [
             WorksheetController::class,
             'delete'
         ])->name('worksheet.delete');
 
-        $router->get('/favourites', [
-            WorksheetController::class,
-            'favourites'
-        ])->name('worksheet.favourites');
+        // $router->get('/favourites', [
+        //     WorksheetController::class,
+        //     'favourites'
+        // ])->name('worksheet.favourites');
 
-        $router->delete('/{worksheet}/delete-favourite', [
-            WorksheetController::class,
-            'deleteFavourite'
-        ])->name('worksheet.deleteFavourite');
+        // $router->delete('/{worksheet}/delete-favourite', [
+        //     WorksheetController::class,
+        //     'deleteFavourite'
+        // ])->name('worksheet.deleteFavourite');
 
-        $router->get('/recents', [
-            WorksheetController::class,
-            'recents'
-        ])->name('worksheet.recents');
+        // $router->get('/recents', [
+        //     WorksheetController::class,
+        //     'recents'
+        // ])->name('worksheet.recents');
 
-        $router->delete('/{worksheet}/delete-recent', [
-            WorksheetController::class,
-            'deleteRecent'
-        ])->name('worksheet.deleteRecent');
+        // $router->delete('/{worksheet}/delete-recent', [
+        //     WorksheetController::class,
+        //     'deleteRecent'
+        // ])->name('worksheet.deleteRecent');
 
         $router->get('/my', [
             WorksheetController::class,

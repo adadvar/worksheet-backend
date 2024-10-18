@@ -41,7 +41,6 @@ class UsersTableSeeder extends Seeder
         $user->roles()->attach($adminRole);
         // $user->save();
 
-        $this->command->info('کاربر ادمین اصلی سایت ایجاد شد');
     }
 
     private function createUser($num = 1, $role)

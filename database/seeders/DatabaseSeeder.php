@@ -17,8 +17,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call(RolesTableSeeder::class);
         $this->call(UsersTableSeeder::class);
-        // $this->call(CitiesTableSeeder::class);
+        $this->call(CitiesTableSeeder::class);
         $this->call(CategoriesTableSeeder::class);
+        $this->call(WorksheetsTableSeeder::class);
         Schema::enableForeignKeyConstraints();
 
         // \App\Models\User::factory(10)->create();

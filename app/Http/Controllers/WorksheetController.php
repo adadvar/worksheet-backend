@@ -57,7 +57,7 @@ class WorksheetController extends Controller
             $query->whereIn($column, $values);
         }
 
-        $query->with(['category']);
+        $query->with(['category.parents']);
 
         if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
         if ($r->o == 'pa') $query->orderBy('price', 'asc');
@@ -71,12 +71,20 @@ class WorksheetController extends Controller
 
     public function show(Request $r)
     {
-        $worksheet = Worksheet::where('slug_url', $r->id_slug)
-            ->orWhere('id', $r->id_slug)
-            ->where('state', 'accepted')
-            ->firstOrFail();
+        // $worksheet = Worksheet::where('slug_url', $r->id_slug)
+        //     ->orWhere('id', $r->id_slug)
+        //     ->where('state', 'accepted')
+        //     ->firstOrFail();
         // event(new VisitWorksheet($worksheet));
-        $worksheet = $worksheet->load('user', 'category');
+        // $worksheet = $worksheet->load('user', 'category');
+
+        $worksheet = Worksheet::find($r->worksheet);
+
+        if (!$worksheet) {
+            return response(['message' => 'Worksheet not found.'], 404);
+        }
+
+        $worksheet->load('category.parents');
         return $worksheet;
     }
 
@@ -230,8 +238,17 @@ class WorksheetController extends Controller
     {
         try {
             DB::beginTransaction();
-            $r->worksheet->delete();
+            $worksheet = $r->worksheet;
+            if ($worksheet->banner) {
+                Storage::delete('worksheets/' . $worksheet->banner);
+            }
+
+            if ($worksheet->file) {
+                Storage::delete('worksheets/' . $worksheet->file);
+            }
+            $worksheet->delete();
             DB::commit();
+
             return response(['message' => 'با موفقیت حذف شد!'], 200);
         } catch (Exception $e) {
             DB::rollBack();
