@@ -15,7 +15,9 @@ class UploadedFileWorksheetId implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $isFileExist =  Storage::exists('worksheets/tmp/' . $value);
+        // $isFileExist =  Storage::exists('worksheets/tmp/' . $value);
+        $isFileExist = Storage::disk('worksheets')->exists('tmp/' . $value);
+
         if (!$isFileExist) {
             $fail('فایل با نام :attribute وجود ندارد.');
         }

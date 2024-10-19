@@ -43,7 +43,7 @@ class WorksheetController extends Controller
             if ($prices[1]) $conditions[] = ['price', '<=', $prices[1]];
         }
 
-        $conditions['state'] = 'accepted';
+        // $conditions['state'] = 'accepted';
 
         if ($categoryRequest) {
             $ids = (Category::extractChildrenIds($categoryRequest));
@@ -94,7 +94,8 @@ class WorksheetController extends Controller
             $banner = $r->file('banner');
 
             $bannerName = time() . Str::random(10) . '-banner.' . $banner->getClientOriginalExtension();
-            Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
+            // Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
+            Storage::disk('worksheets')->putFileAs('tmp', $banner, $bannerName);
 
             DB::table('temporary_files')->insert([
                 'file_name' => $bannerName,
@@ -114,7 +115,8 @@ class WorksheetController extends Controller
         try {
             $file = $r->file('file');
             $fileName = time() . Str::random(10) . '-file.' . $file->getClientOriginalExtension();
-            Storage::putFileAs('worksheets/tmp', $file, $fileName);
+            // Storage::putFileAs('worksheets/tmp', $file, $fileName);
+            Storage::disk('worksheets')->putFileAs('tmp', $file, $fileName);
 
             DB::table('temporary_files')->insert([
                 'file_name' => $fileName,
@@ -136,47 +138,32 @@ class WorksheetController extends Controller
 
             $user = auth()->user();
             $data = $r->validated();
-            // $data['user_id'] = $user->id;
             $category = $r->category;
             $data['category_id'] = $category->id;
 
-            // $imageArr = [];
-            // if ($r->hasFile('images')) {
-            //     // foreach ($r->file('images') as $file) {
-            //     //     $image = $file;
-            //     $image = $r->file('image');
-            //     $imageName = time() . bin2hex(random_bytes(5)) . '-image';
-            //     Storage::disk('worksheets')->put('/' . $imageName, $image->get());
-            //     $imageArr[] = $imageName;
-            // }
-            // }
-            // $data['images'] = ($imageArr);
-            // $slug = bin2hex(random_bytes(5));
 
             if (!$r->slug) {
                 $slug = Str::slug($r->name);
                 $data['slug'] = $slug;
             }
-            // if ($r->hasFile('file_path')) {
-            //     $file = $r->file('file_path');
-            //     $fileName = time() . bin2hex(random_bytes(5)) . '-file';
-            //     Storage::disk('worksheets')->put('/' . $fileName, $file->get());
-            //     $data['file_path'] = $fileName;
-            // }
 
             $worksheet = $category->worksheets()->create($data);
 
-            if ($r->has('banner')) {
+            if ($r->has('banner') && !empty($r->banner)) {
                 $bannerName = $r->banner;
-                Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
+                // Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
+                Storage::disk('worksheets')->move('tmp/' . $bannerName, $bannerName);
+
                 $worksheet->banner = $bannerName;
 
                 DB::table('temporary_files')->where('file_name', $bannerName)->delete();
             }
 
-            if ($r->has('file')) {
+            if ($r->has('file') && !empty($r->file)) {
                 $fileName = $r->file;
-                Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
+                // Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
+                Storage::disk('worksheets')->move('tmp/' . $fileName, $fileName);
+
                 $worksheet->file = $fileName;
 
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
@@ -198,23 +185,30 @@ class WorksheetController extends Controller
     {
         try {
             DB::beginTransaction();
-
             $user = auth()->user();
             $data = $r->validated();
             $worksheet = $r->worksheet;
 
-            if ($r->has('banner')) {
+            if ($r->has('banner') && !empty($r->banner)) {
                 if ($worksheet->banner) {
-                    Storage::delete('worksheets/' . $worksheet->banner);
+                    // Storage::delete('worksheets/' . $worksheet->banner);
+                    Storage::disk('worksheets')->delete($worksheet->banner);
+
                 }
-                Storage::move('worksheets/tmp/' . $data['banner'], 'worksheets/' . $data['banner']);
+                // Storage::move('worksheets/tmp/' . $data['banner'], 'worksheets/' . $data['banner']);
+                Storage::disk('worksheets')->move('tmp/' . $data['banner'], $data['banner']);
+
             }
 
-            if ($r->has('file')) {
+            if ($r->has('file') && !empty($r->file)) {
                 if ($worksheet->file) {
-                    Storage::delete('worksheets/' . $worksheet->file);
+                    // Storage::delete('worksheets/' . $worksheet->file);
+                    Storage::disk('worksheets')->delete($worksheet->file);
+
                 }
-                Storage::move('worksheets/tmp/' . $data['file'], 'worksheets/' . $data['file']);
+                // Storage::move('worksheets/tmp/' . $data['file'], 'worksheets/' . $data['file']);
+                Storage::disk('worksheets')->move('tmp/' . $data['file'], $data['file']);
+
             }
 
             if (!$r->slug) {
@@ -240,11 +234,13 @@ class WorksheetController extends Controller
             DB::beginTransaction();
             $worksheet = $r->worksheet;
             if ($worksheet->banner) {
-                Storage::delete('worksheets/' . $worksheet->banner);
+                // Storage::delete('worksheets/' . $worksheet->banner);
+                Storage::disk('worksheets')->delete($worksheet->banner);
             }
 
             if ($worksheet->file) {
-                Storage::delete('worksheets/' . $worksheet->file);
+                // Storage::delete('worksheets/' . $worksheet->file);
+                Storage::disk('worksheets')->delete($worksheet->file);
             }
             $worksheet->delete();
             DB::commit();
