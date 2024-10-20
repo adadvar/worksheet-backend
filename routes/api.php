@@ -196,7 +196,7 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
         ])->name('worksheet.admin.show');
 
 
-        $router->post('/{category}', [
+        $router->post('/', [
             WorksheetController::class,
             'create'
         ])->name('worksheet.create');

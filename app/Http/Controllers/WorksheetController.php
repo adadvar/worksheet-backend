@@ -138,16 +138,13 @@ class WorksheetController extends Controller
 
             $user = auth()->user();
             $data = $r->validated();
-            $category = $r->category;
-            $data['category_id'] = $category->id;
-
 
             if (!$r->slug) {
                 $slug = Str::slug($r->name);
                 $data['slug'] = $slug;
             }
 
-            $worksheet = $category->worksheets()->create($data);
+            $worksheet = Worksheet::create($data);
 
             if ($r->has('banner') && !empty($r->banner)) {
                 $bannerName = $r->banner;

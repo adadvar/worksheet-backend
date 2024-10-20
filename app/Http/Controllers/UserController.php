@@ -143,7 +143,7 @@ class UserController extends Controller
   public function me(UserMeRequest $request)
   {
     $user = auth()->user();
-
+  
     return $user;
   }
 

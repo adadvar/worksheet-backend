@@ -59,6 +59,8 @@ class User extends Authenticatable
         'verified_at' => 'datetime',
     ];
 
+    protected $with = ['roles'];
+
     public function setMobileAttribute($value)
     {
         $this->attributes['mobile'] = to_valid_mobile_number($value);
