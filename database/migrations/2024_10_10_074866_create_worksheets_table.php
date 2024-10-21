@@ -13,7 +13,9 @@ return new class extends Migration
     {
         Schema::create('worksheets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('grade_id');
+            $table->unsignedBigInteger('subject_id');
+            $table->unsignedBigInteger('topic_id');
             // $table->unsignedBigInteger('level_id');
             $table->string('name', 100)->nullable();
             $table->string('slug', 100)->nullable();
@@ -26,7 +28,19 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->foreign('category_id')
+            $table->foreign('grade_id')
+                ->references('id')
+                ->on('categories')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+                $table->foreign('subject_id')
+                ->references('id')
+                ->on('categories')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
+
+                $table->foreign('topic_id')
                 ->references('id')
                 ->on('categories')
                 ->onDelete('cascade')

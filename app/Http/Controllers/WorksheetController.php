@@ -57,7 +57,8 @@ class WorksheetController extends Controller
             $query->whereIn($column, $values);
         }
 
-        $query->with(['category.parents']);
+        $query->with(['grade', 'subject', 'topic']);
+
 
         if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
         if ($r->o == 'pa') $query->orderBy('price', 'asc');
@@ -83,8 +84,8 @@ class WorksheetController extends Controller
         if (!$worksheet) {
             return response(['message' => 'Worksheet not found.'], 404);
         }
+        $worksheet->load('grade', 'subject', 'topic');
 
-        $worksheet->load('category.parents');
         return $worksheet;
     }
 

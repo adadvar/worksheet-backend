@@ -29,7 +29,9 @@ class   WorksheetCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_id' => 'nullable|exists:categories,id',
+            'grade_id' => 'nullable|exists:categories,id',
+            'subject_id' => 'nullable|exists:categories,id',
+            'topic_id' => 'nullable|exists:categories,id',       
             'name' => 'nullable|string|max:100',
             'slug' => 'nullable|string|unique:worksheets,slug|max:100',
             'description' => 'nullable|string',

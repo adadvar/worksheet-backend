@@ -11,7 +11,17 @@ class Worksheet extends Model
     use HasFactory;
 
     protected $table = 'worksheets';
-    protected $fillable = ['category_id', 'name', 'slug', 'description', 'price', 'banner', 'file', 'publish_at'];
+    protected $fillable = [
+        'grade_id',
+        'subject_id',
+        'topic_id', 
+        'name',
+        'slug',
+        'description',
+        'price',
+        'banner',
+        'file',
+        'publish_at'];
 
     protected $appends = ['age'];
 
@@ -29,9 +39,19 @@ class Worksheet extends Model
         return $this->hasMany(Comment::class);
     }
 
-    public function category()
+    public function grade()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Category::class, 'grade_id');
+    }
+
+    public function subject()
+    {
+        return $this->belongsTo(Category::class, 'subject_id');
+    }
+
+    public function topic()
+    {
+        return $this->belongsTo(Category::class, 'topic_id');
     }
 
     public function level()
