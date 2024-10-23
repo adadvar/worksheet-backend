@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Worksheet;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -56,5 +59,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('user', User::class);
         Route::model('category', Category::class);
         Route::model('worksheet', Worksheet::class);
+        Route::model('order', Order::class);
+        Route::model('cart', Cart::class);
     }
 }

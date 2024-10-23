@@ -19,6 +19,7 @@ class Order extends Model
     const TYPE_CANCELLED = 'cancelled';
     const TYPES = [self::TYPE_PENDING, self::TYPE_PAID, self::TYPE_REJECTED, self::TYPE_CANCELLED];
 
+    protected $with = ['orderitems'];
 
     public function worksheets()
     {
@@ -30,7 +31,7 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function OrderItems()
+    public function orderitems()
     {
         return $this->hasMany(OrderItem::class);
     }

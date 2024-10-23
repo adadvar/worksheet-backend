@@ -2,8 +2,6 @@
 
 namespace App\Policies;
 
-use App\Models\Advert;
-use App\Models\AdvertFavourite;
 use App\Models\User;
 use App\Models\Worksheet;
 use Illuminate\Auth\Access\HandlesAuthorization;

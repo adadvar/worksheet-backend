@@ -124,21 +124,24 @@ class UserController extends Controller
   }
 
   public function delete(UserDeleteRequest $request)
-  {
+{
     try {
-      DB::beginTransaction();
-      $request->user->delete();
-      DB::table('oauth_access_tokens')
-        ->where('user_id', $request->user->id)
-        ->delete();
-      DB::commit();
-      return response(['message' => 'کاربر با موفقیت حذف شد!'], 200);
+        DB::beginTransaction();
+
+        $request->user->delete();
+        DB::table('personal_access_tokens')
+            ->where('tokenable_id', $request->user->id)
+            ->where('tokenable_type', User::class)
+            ->delete();
+        DB::commit();
+        
+        return response(['message' => 'کاربر با موفقیت حذف شد!'], 200);
     } catch (Exception $e) {
-      DB::rollBack();
-      Log::error($e);
-      return response(['message' => 'خطایی رخ داده است !'], 500);
+        DB::rollBack();
+        Log::error($e);
+        return response(['message' => 'خطایی رخ داده است!'], 500);
     }
-  }
+}
 
   public function me(UserMeRequest $request)
   {

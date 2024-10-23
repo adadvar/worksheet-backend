@@ -59,6 +59,11 @@ class Worksheet extends Model
         return $this->belongsTo(Level::class);
     }
 
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
     public function getAgeAttribute()
     {
         $diff = $this->created_at->diffForHumans(null, true, true, 2);

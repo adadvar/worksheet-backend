@@ -96,6 +96,11 @@ class User extends Authenticatable
         return $this->hasRole('parent');
     }
 
+    public function isUser()
+    {
+        return $this->hasRole('teacher') || $this->hasRole('student') || $this->hasRole('parent');
+    }
+
     public function hasRole($role)
     {
         return $this->roles->contains('name', $role);
@@ -114,6 +119,11 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    public function cart()
+    {
+        return $this->hasOne(Cart::class);
     }
 
     // public function favouriteWorksheets()

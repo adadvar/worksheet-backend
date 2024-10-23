@@ -4,10 +4,15 @@ namespace App\Providers;
 
 // use Illuminate\Support\Facades\Gate;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\User;
 use App\Models\Worksheet;
+use App\Policies\CartPolicy;
 use App\Policies\CategoryPolicy;
+use App\Policies\OrderPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\WorksheetPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -23,7 +28,9 @@ class AuthServiceProvider extends ServiceProvider
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
         User::class => UserPolicy::class,
         Category::class => CategoryPolicy::class,
-        Worksheet::class => WorksheetPolicy::class
+        Worksheet::class => WorksheetPolicy::class,
+        Order::class => OrderPolicy::class,
+        Cart::class => CartPolicy::class,
     ];
 
     /**
