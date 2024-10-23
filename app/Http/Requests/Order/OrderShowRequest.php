@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class OrderShowRequest extends FormRequest
 {
@@ -13,7 +15,7 @@ class OrderShowRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('show', $this->order);
     }
 
     /**

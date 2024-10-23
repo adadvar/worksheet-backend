@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorksheetController;
 use Illuminate\Http\Request;
@@ -277,5 +278,30 @@ Route::group(['prefix' => 'cart'], function ($router) {
             CartController::class,
             'delete'
         ])->name('cartitem.delete');
+    });
+});
+
+
+Route::group(['prefix' => 'order'], function ($router) {
+    Route::group(['middleware' => ['auth:sanctum']], function ($router) {
+        $router->get('/', [
+            OrderController::class,
+            'list'
+        ])->name('order.list');
+
+        $router->post('/', [
+            OrderController::class,
+            'create'
+        ])->name('order.create');
+
+        $router->put('/{order}', [
+            OrderController::class,
+            'update'
+        ])->name('order.update');
+
+        $router->delete('/{order}', [
+            OrderController::class,
+            'delete'
+        ])->name('order.delete');
     });
 });
