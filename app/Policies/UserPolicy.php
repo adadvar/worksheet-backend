@@ -36,7 +36,7 @@ class UserPolicy
 
     public function update(User $user, User $user2)
     {
-        return ($user->isAdmin() || ($user->id == $user2->id));
+        return ($user->isAdmin());
     }
 
     public function resetPassword(User $user, User $user2)

@@ -165,6 +165,10 @@ class UserController extends Controller
   public function update(UserUpdateRequest $request)
   {
     $request->user->update($request->validated());
+    if ($request->has('role_id')) 
+      $request->user->roles()->sync($request->input('role_id'));
+      $request->user->load('roles');
+
     return $request->user;
   }
 
