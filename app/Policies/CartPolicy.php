@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Models\Cart;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -18,6 +19,17 @@ class CartPolicy
     {
         //
     }
+
+    public function list(User $user, Cart $cart = null)
+    {
+        return $user->isAdmin() || ($cart && $user->id == $cart->user_id);
+    }
+
+    public function show(User $user, Cart $cart = null)
+    {
+        return $user->isAdmin() || ($cart && $user->id == $cart->user_id);
+    }
+
 
     public function addToCart(User $user)
     {

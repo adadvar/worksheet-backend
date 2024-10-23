@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorksheetController;
@@ -251,5 +252,30 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             WorksheetController::class,
             'my'
         ])->name('worksheet.my');
+    });
+});
+
+
+Route::group(['prefix' => 'cart'], function ($router) {
+    Route::group(['middleware' => ['auth:sanctum']], function ($router) {
+        $router->get('/', [
+            CartController::class,
+            'current'
+        ])->name('cart.current');
+
+        $router->post('/', [
+            CartController::class,
+            'create'
+        ])->name('cartitem.create');
+
+        $router->put('/{cartItem}', [
+            CartController::class,
+            'update'
+        ])->name('cartitem.update');
+
+        $router->delete('/{cartItem}', [
+            CartController::class,
+            'delete'
+        ])->name('cartitem.delete');
     });
 });

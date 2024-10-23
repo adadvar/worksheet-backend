@@ -61,5 +61,6 @@ class RouteServiceProvider extends ServiceProvider
         Route::model('worksheet', Worksheet::class);
         Route::model('order', Order::class);
         Route::model('cart', Cart::class);
+        Route::model('cartItem', CartItem::class);
     }
 }

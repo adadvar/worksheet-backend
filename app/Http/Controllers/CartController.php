@@ -2,37 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Cart\CartCreateRequest;
+use App\Http\Requests\Cart\CartDeleteRequest;
+use App\Http\Requests\Cart\CartShowRequest;
+use App\Http\Requests\Cart\CartUpdateRequest;
 use App\Models\CartItem;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class CartController extends Controller {
+class CartController extends Controller
+{
 
-    public function list(Request $request)
+    public function current(CartShowRequest $r)
     {
-        $cart = $request->user()->cart;
+        $cart = $r->user()->cart;
         return response()->json($cart->load('cartItems'));
     }
 
-    public function create(Request $request)
+    public function create(CartCreateRequest $r)
     {
-        $request->validate([
-            'worksheet_id' => 'required|exists:worksheets,id',
-            'quantity' => 'nullable|integer',
-            'price' => 'nullable|numeric',
-        ]);
-
         try {
             DB::beginTransaction();
 
-            $cart = $request->user()->cart ?? $request->user()->cart()->create();
+            $cart = $r->user()->cart ?? $r->user()->cart()->create();
 
             $cartItem = $cart->cartItems()->create([
-                'worksheet_id' => $request->worksheet_id,
-                'quantity' => $request->quantity,
-                'price' => $request->price,
+                'worksheet_id' => $r->worksheet_id,
+                'quantity' => $r->quantity,
+                'price' => $r->price,
             ]);
 
             DB::commit();
@@ -45,16 +43,11 @@ class CartController extends Controller {
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(CartUpdateRequest $r)
     {
-        $request->validate([
-            'quantity' => 'nullable|integer',
-            'price' => 'nullable|numeric',
-        ]);
-
         try {
-            $cartItem = CartItem::findOrFail($id);
-            $cartItem->update($request->only(['quantity', 'price']));
+            $cartItem = $r->cartItem;
+            $cartItem->update($r->only(['quantity', 'price']));
 
             return response()->json($cartItem);
         } catch (Exception $e) {
@@ -63,10 +56,10 @@ class CartController extends Controller {
         }
     }
 
-    public function delete($id)
+    public function delete(CartDeleteRequest $r)
     {
         try {
-            $cartItem = CartItem::findOrFail($id);
+            $cartItem = $r->cartItem;
             $cartItem->delete();
 
             return response()->json(['message' => 'آیتم سبد خرید با موفقیت حذف شد!'], 200);
