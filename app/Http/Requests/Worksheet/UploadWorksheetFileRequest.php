@@ -25,7 +25,7 @@ class UploadWorksheetFileRequest extends FormRequest
     public function rules()
     {
         return [
-            'file' => 'required|mimeTypes:application/pdf|max:10240',
+            'file' => 'required|mimes:doc,docx,pdf|max:10240',
         ];
     }
 }

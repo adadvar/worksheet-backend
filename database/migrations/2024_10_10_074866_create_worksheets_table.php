@@ -22,7 +22,8 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->string('banner')->nullable();
-            $table->string('file')->nullable();
+            $table->string('file_word')->nullable();
+            $table->string('file_pdf')->nullable();
             $table->timestamp('publish_at')->nullable();
 
             $table->timestamps();
@@ -34,13 +35,13 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-                $table->foreign('subject_id')
+            $table->foreign('subject_id')
                 ->references('id')
                 ->on('categories')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-                $table->foreign('topic_id')
+            $table->foreign('topic_id')
                 ->references('id')
                 ->on('categories')
                 ->onDelete('cascade')

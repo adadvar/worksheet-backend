@@ -14,14 +14,16 @@ class Worksheet extends Model
     protected $fillable = [
         'grade_id',
         'subject_id',
-        'topic_id', 
+        'topic_id',
         'name',
         'slug',
         'description',
         'price',
         'banner',
-        'file',
-        'publish_at'];
+        'file_word',
+        'file_pdf',
+        'publish_at'
+    ];
 
     protected $appends = ['age'];
 
@@ -79,14 +81,14 @@ class Worksheet extends Model
     {
         return Storage::disk('worksheets')->url($this->file);
     }
-    
+
 
     public function toArray()
     {
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_link'] = $this->file_link;
-        
+
         return $data;
     }
 }
