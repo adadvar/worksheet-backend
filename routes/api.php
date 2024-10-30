@@ -125,7 +125,7 @@ Route::group(['prefix' => 'category'], function ($router) {
         'list'
     ])->name('category.list');
 
-    $router->get('/{category}', [
+    $router->get('/{grade?}/{subject?}/{topic?}', [
         CategoryController::class,
         'show'
     ])->name('category.show');

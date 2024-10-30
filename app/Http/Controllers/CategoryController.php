@@ -29,15 +29,30 @@ class CategoryController extends Controller
 
     public function show(CategoryShowRequest $r)
     {
-        $query = $r->category->child();
+        $results = [];
 
-        if ($r->q) {
-            $query->where('name', 'LIKE', '%' . $r->q . '%');
+        if ($r->grade) {
+            $results[] = Category::where(['type' => 'grade', 'slug' => $r->grade])->first();
         }
-        if ($r->page)
-            return $query->paginate($r->per_page ?? 10);
 
-        return $query->get();
+        if ($r->subject) {
+            $results[] = Category::where(['type' => 'subject', 'slug' => $r->subject])
+                ->whereHas('parent', function ($query) use ($r) {
+                    $query->where('slug', $r->grade);
+                })->first();
+        }
+
+        if ($r->topic) {
+            $results[] = Category::where(['type' => 'topic', 'slug' => $r->topic])
+                ->whereHas('parent', function ($query) use ($r) {
+                    $query->where('slug', $r->subject);
+                })
+                ->whereHas('parent.parent', function ($query) use ($r) {
+                    $query->where('slug', $r->grade);
+                })->first();
+        }
+
+        return end($results);
     }
 
     public function create(CategoryCreateRequest $r)
