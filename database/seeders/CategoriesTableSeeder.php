@@ -20,12 +20,12 @@ class CategoriesTableSeeder extends Seeder
         }
 
         $grades = [
-            ['name' => 'اول', 'slug' => 'aval', 'type' => 'grade'],
-            ['name' => 'دوم', 'slug' => 'dovom', 'type' => 'grade'],
-            ['name' => 'سوم', 'slug' => 'sevom', 'type' => 'grade'],
-            ['name' => 'چهارم', 'slug' => 'chaharom', 'type' => 'grade'],
-            ['name' => 'پنجم', 'slug' => 'panjom', 'type' => 'grade'],
-            ['name' => 'ششم', 'slug' => 'sheshom', 'type' => 'grade'],
+            ['name' => 'کلاس اول', 'slug' => 'aval-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس دوم', 'slug' => 'dovom-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس سوم', 'slug' => 'sevom-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس چهارم', 'slug' => 'chaharom-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس پنجم', 'slug' => 'panjom-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس ششم', 'slug' => 'sheshom-ebtedayi', 'type' => 'grade'],
         ];
 
         $subjects = [
