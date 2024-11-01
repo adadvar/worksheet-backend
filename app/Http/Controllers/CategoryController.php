@@ -52,7 +52,7 @@ class CategoryController extends Controller
                 })->first();
         }
 
-        return end($results);
+        return ($results);
     }
 
     public function create(CategoryCreateRequest $r)
