@@ -33,7 +33,7 @@ class AuthController extends Controller
 
             $token = $user->createToken('myapptoken')->plainTextToken;
 
-            return response(['user' => $user, 'token' => $token], 200);
+            return response(['user' => $user, 'token' => $token, 'message' => 'با موفقیت وارد شدید'], 200);
         } catch (Exception $exception) {
             Log::error($exception);
             return response(
@@ -56,7 +56,7 @@ class AuthController extends Controller
                     throw new UserAlreadyRegisteredException('شما قبلا ثبت نام کرده اید');
                 }
 
-                return response(['message' => 'کد فعالسازی قبلا برای شما ارسال شده'], 200);
+                return response(['message' => 'کد فعالسازی قبلا برای شما ارسال شده'], 400);
             }
 
             $code = random_verification_code();
@@ -76,7 +76,7 @@ class AuthController extends Controller
             }
 
             DB::commit();
-            return response(['message' => 'کاربر ثبت موقت شد'], 200);
+            return response(['message' => 'کد تایید ارسال شد'], 200);
         } catch (Exception $exception) {
             Db::rollBack();
 
@@ -94,6 +94,7 @@ class AuthController extends Controller
         $field = $request->getFieldName();
         $value = $request->getFieldValue();
         $code = $request->code;
+        $password = $request->password;
         $user = User::where(['verify_code' => $code, $field => $value])->first();
 
         if (empty($user)) {
@@ -106,10 +107,12 @@ class AuthController extends Controller
         $value = $request->input($field);
         $user->verify_code = null;
         $user->verified_at = now();
-        $user->password = bcrypt($value);
+        $user->password = bcrypt($password);
         $user->save();
 
-        return response($user, 200);
+        //TODO: change it comming from user
+        $user->roles()->sync(2);
+        return response(['user' => $user, 'message' => 'با موفقیت ثبت نام شدید'], 200);
     }
 
     public function resendVerificationCode(ResendVerificationCodeRequest $request)

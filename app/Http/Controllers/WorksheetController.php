@@ -178,7 +178,8 @@ class WorksheetController extends Controller
             $worksheet->save();
             DB::commit();
 
-            return response($worksheet, 201);
+            return response(['message' => 'کاربرگ جدید ایجاد شد'], 201);
+            // return response($worksheet, 201);
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -235,7 +236,8 @@ class WorksheetController extends Controller
             $worksheet->update($data);
             DB::commit();
 
-            return response($worksheet, 200);
+            return response(['message' => 'کاربرگ بروزرسانی شد'], 201);
+            // return response($worksheet, 200);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getTraceAsString());
@@ -262,11 +264,11 @@ class WorksheetController extends Controller
             $worksheet->delete();
             DB::commit();
 
-            return response(['message' => 'با موفقیت حذف شد!'], 200);
+            return response(['message' => 'با موفقیت حذف شد'], 200);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            return response(['message' => 'خطایی رخ داده است !'], 500);
+            return response(['message' => 'خطایی رخ داده است'], 500);
         }
     }
 

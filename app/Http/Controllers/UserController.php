@@ -92,7 +92,7 @@ class UserController extends Controller
       ], 200);
     } catch (Exception $e) {
       Log::error($e);
-      return response(['message' => 'خطایی رخ داده است !'], 500);
+      return response(['message' => 'خطایی رخ داده است '], 500);
     }
   }
 
@@ -115,38 +115,38 @@ class UserController extends Controller
       DB::beginTransaction();
       $request->user()->delete();
       DB::commit();
-      return response(['message' => 'با موفقیت لغو ثبت نام شد!'], 200);
+      return response(['message' => 'با موفقیت لغو ثبت نام شد'], 200);
     } catch (Exception $e) {
       DB::rollBack();
       Log::error($e);
-      return response(['message' => 'خطایی رخ داده است !'], 500);
+      return response(['message' => 'خطایی رخ داده است'], 500);
     }
   }
 
   public function delete(UserDeleteRequest $request)
-{
+  {
     try {
-        DB::beginTransaction();
+      DB::beginTransaction();
 
-        $request->user->delete();
-        DB::table('personal_access_tokens')
-            ->where('tokenable_id', $request->user->id)
-            ->where('tokenable_type', User::class)
-            ->delete();
-        DB::commit();
-        
-        return response(['message' => 'کاربر با موفقیت حذف شد!'], 200);
+      $request->user->delete();
+      DB::table('personal_access_tokens')
+        ->where('tokenable_id', $request->user->id)
+        ->where('tokenable_type', User::class)
+        ->delete();
+      DB::commit();
+
+      return response(['message' => 'کاربر با موفقیت حذف شد'], 200);
     } catch (Exception $e) {
-        DB::rollBack();
-        Log::error($e);
-        return response(['message' => 'خطایی رخ داده است!'], 500);
+      DB::rollBack();
+      Log::error($e);
+      return response(['message' => 'خطایی رخ داده است'], 500);
     }
-}
+  }
 
   public function me(UserMeRequest $request)
   {
     $user = auth()->user();
-  
+
     return $user;
   }
 
@@ -168,11 +168,13 @@ class UserController extends Controller
   public function update(UserUpdateRequest $request)
   {
     $request->user->update($request->validated());
-    if ($request->has('role_id')) 
+    if ($request->has('role_id'))
       $request->user->roles()->sync($request->input('role_id'));
-      $request->user->load('roles');
+    $request->user->load('roles');
 
-    return $request->user;
+    return response([
+      'message' => 'کاربر با موفقیت بروزرسانی شد'
+    ], 200);
   }
 
   public function resetPassword(UserResetPasswordRequest $request)
@@ -180,7 +182,7 @@ class UserController extends Controller
     $request->user->update(['password' => env('REQUEST_PASSWORD_DEFAULT', bcrypt('111111'))]);
     // return response(null, Response::HTTP_ACCEPTED);
     return response([
-      'message' => 'پسورد با موفقیت بازنشانی شد!'
+      'message' => 'پسورد با موفقیت بازنشانی شد'
     ], 200);
   }
 }
