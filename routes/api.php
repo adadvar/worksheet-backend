@@ -38,6 +38,21 @@ Route::group([], function ($router) {
         'registerVerify'
     ])->name('auth.register.verify');
 
+    $router->post('login-verify', [
+        AuthController::class,
+        'loginVerify'
+    ])->name('auth.login.verify');
+
+    $router->post('password-verify', [
+        UserController::class,
+        'passwordVerify'
+    ])->name('user.password.verify');
+
+    $router->post('send-otp', [
+        AuthController::class,
+        'sendOtp'
+    ])->name('auth.send.otp');
+
     $router->post('resend-verification-code', [
         AuthController::class,
         'resendVerificationCode'

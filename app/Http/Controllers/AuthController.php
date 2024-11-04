@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\UserAlreadyRegisteredException;
 use App\Http\Requests\Auth\LoginNewUserRequest;
+use App\Http\Requests\Auth\LoginVerifyNewUserRequest;
 use App\Http\Requests\Auth\RegisterNewUserRequest;
 use App\Http\Requests\Auth\RegisterVerifyUserRequest;
 use App\Http\Requests\Auth\ResendVerificationCodeRequest;
@@ -147,5 +148,68 @@ class AuthController extends Controller
         return response([
             'message' => 'کاربر یافت نشد یا از قبل ثبت نام کرده است'
         ], 404);
+    }
+
+    public function sendOtp(ResendVerificationCodeRequest $request)
+    {
+        $field = $request->getFieldName();
+        $value = $request->getFieldValue();
+
+        $user = User::where($field, $value)->whereNotNull('verified_at')->first();
+        if (!empty($user)) {
+            $dateDiff = now()->diffInSeconds($user->updated_at);
+
+            if ($dateDiff > config('auth.resend_verification_code_time_diff', 60)) {
+                $user->verify_code = random_verification_code();
+                $user->save();
+            } else {
+                return response([
+                    'message' => 'لطفا بعد از گذشت یک دقیقه تلاش کنید'
+                ], 500);
+            }
+
+
+            Log::info('RESEND-REGISTER-CODE-MESSAGE-TO-USER', ['code' => $user->verify_code]);
+            if ($field === 'email') {
+                Mail::to($user)->send(new VerificationCodeMail($user->verify_code));
+            } else {
+                // \Kavenegar::Send(config('kavenegar.sender'), $value, 'کد فعالسازی ' . $code);
+            }
+
+            return response([
+                'message' => 'کد مجددا برای شما ارسال گردید.'
+            ], 200);
+        }
+
+        // throw new ModelNotFoundException('کاربر پیدا نشد یا از قبل ثبت نام کرده است');
+        return response([
+            'message' => 'کاربر یافت نشد یا از قبل ثبت نام کرده است'
+        ], 404);
+    }
+
+    public function loginVerify(LoginVerifyNewUserRequest $r)
+    {
+        try {
+            $user = User::where('email', $r->username)->orWhere('mobile', to_valid_mobile_number($r->username))->first();
+
+            if (!$user || $r->code !== $user->verify_code) {
+                return response([
+                    'message' => 'نام کاربری یا کد یکبارمصرف اشتباه می باشد.'
+                ], 401);
+            }
+
+            $user->verify_code = null;
+            $user->save();
+
+            $token = $user->createToken('myapptoken')->plainTextToken;
+
+            return response(['user' => $user, 'token' => $token, 'message' => 'با موفقیت وارد شدید'], 200);
+        } catch (Exception $exception) {
+            Log::error($exception);
+            return response(
+                ['message' => 'خطایی رخ داده است'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }

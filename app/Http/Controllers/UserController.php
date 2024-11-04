@@ -11,6 +11,7 @@ use App\Http\Requests\User\UserDeleteRequest;
 use App\Http\Requests\User\UserGetRequest;
 use App\Http\Requests\User\UserListRequest;
 use App\Http\Requests\User\UserMeRequest;
+use App\Http\Requests\User\UserPasswordVerifyRequest;
 use App\Http\Requests\User\UserResetPasswordRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Mail\VerificationCodeMail;
@@ -183,6 +184,31 @@ class UserController extends Controller
     // return response(null, Response::HTTP_ACCEPTED);
     return response([
       'message' => 'پسورد با موفقیت بازنشانی شد'
-    ], 200);
+    ], 201);
+  }
+
+  public function passwordVerify(UserPasswordVerifyRequest $r)
+  {
+    try {
+      $user = User::where('email', $r->username)->orWhere('mobile', to_valid_mobile_number($r->username))->first();
+
+      if (!$user || $r->code !== $user->verify_code) {
+        return response([
+          'message' => 'نام کاربری یا کد یکبارمصرف اشتباه می باشد.'
+        ], 401);
+      }
+
+      $user->update(['password' => bcrypt($r->password), 'verify_code' => null]);
+      return response([
+        'message' => 'پسورد با موفقیت تغییر کرد'
+      ], 201);
+    } catch (Exception $exception) {
+
+      Log::error($exception);
+      return response(
+        ['message' => 'خطایی رخ داده است'],
+        Response::HTTP_INTERNAL_SERVER_ERROR
+      );
+    }
   }
 }

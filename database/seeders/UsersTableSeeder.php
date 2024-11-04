@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
@@ -35,6 +36,7 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('111111'),
             'email' => 'admin@worksheet.com',
             'mobile' => '+989000000000',
+            'verified_at' => now()
         ]);
 
         $adminRole = Role::where('name', 'admin')->first();
@@ -50,6 +52,7 @@ class UsersTableSeeder extends Seeder
             'password' => Hash::make('111111'),
             'email' => 'user' . $num . '@worksheet.com',
             'mobile' => '+989' . str_repeat($num, 9),
+            'verified_at' => now()
         ]);
 
         $userRole = Role::where('name', $role)->first();
