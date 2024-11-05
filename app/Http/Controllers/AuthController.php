@@ -177,7 +177,7 @@ class AuthController extends Controller
             }
 
             return response([
-                'message' => 'کد مجددا برای شما ارسال گردید.'
+                'message' => 'رمز یکبارمصرف برای شما ارسال گردید'
             ], 200);
         }
 

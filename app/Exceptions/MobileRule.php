@@ -37,6 +37,6 @@ class MobileRule implements Rule
      */
     public function message()
     {
-        return 'mobile num ber is wrong!';
+        return 'فرمت موبایل اشتباه می باشد';
     }
 }

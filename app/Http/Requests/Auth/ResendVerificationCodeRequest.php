@@ -27,10 +27,16 @@ class ResendVerificationCodeRequest extends FormRequest
     {
         return [
             'mobile' => ['required_without:email', new MobileRule],
-            'email' => 'required_without:mobile|email',   
+            'email' => 'required_without:mobile|email',
         ];
     }
 
-
-   
+    public function messages()
+    {
+        return [
+            'mobile.required_without' => 'موبایل یا ایمیل خود را وارد کنید',
+            'email.required_without' => 'موبایل یا ایمیل خود را وارد کنید',
+            'email.email' => 'فرمت ایمیل اشتباه می باشد',
+        ];
+    }
 }
