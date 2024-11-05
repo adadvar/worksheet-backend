@@ -24,20 +24,44 @@ class WorksheetController extends Controller
     {
         $whereIns = [];
         $conditions = [];
-        $categoryRequest = null;
+        $categoryRequests = null;
 
-        if ($r->param1 && !$r->param2 && !$r->param3) {
-            $categoryRequest = Category::whereSlug($r->param1)->first();
+        if ($r->param1) {
+            $categoryRequests = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
         }
 
-        if ($r->param1 && $r->param2 && !$r->param3) {
-            $categoryRequest = Category::whereSlug($r->param2)->first();
+        if ($r->param2) {
+            $categoryRequests = Category::where('slug', $r->param2)
+                ->where(function ($query) use ($r) {
+                    $query->whereHas('parent', function ($query) use ($r) {
+                        $query->where('slug', $r->param1);
+                    })->orWhereHas('parent.parent', function ($query) use ($r) {
+                        $query->where('slug', $r->param1);
+                    });
+                })->get();
         }
 
-        if ($r->param1 && $r->param2 && $r->param3) {
-            $categoryRequest = Category::whereSlug($r->param2)->first();
+        if ($r->param3) {
+            $categoryRequests = Category::where(['type' => 'topic', 'slug' => $r->param3])
+                ->whereHas('parent', function ($query) use ($r) {
+                    $query->where('slug', $r->param2);
+                })
+                ->whereHas('parent.parent', function ($query) use ($r) {
+                    $query->where('slug', $r->param1);
+                })->get();
         }
 
+        if ($categoryRequests) {
+            $ids = [];
+            foreach ($categoryRequests as $categoryRequest) {
+                $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
+            }
+            $ids = array_unique($ids);
+
+            $whereIns['grade_id'] = $ids;
+            $whereIns['subject_id'] = $ids;
+            $whereIns['topic_id'] = $ids;
+        }
 
         if ($r->price) {
             $prices = explode('-', $r->price);
@@ -45,22 +69,14 @@ class WorksheetController extends Controller
             if ($prices[1]) $conditions[] = ['price', '<=', $prices[1]];
         }
 
-        // $conditions['state'] = 'accepted';
-
-        if ($categoryRequest) {
-            $ids = (Category::extractChildrenIds($categoryRequest));
-            $whereIns['category_id'] = $ids;
-        }
-
         $query = Worksheet::query();
 
         $query->where($conditions);
         foreach ($whereIns as $column => $values) {
-            $query->whereIn($column, $values);
+            $query->orWhereIn($column, $values);
         }
 
         $query->with(['grade', 'subject', 'topic']);
-
 
         if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
         if ($r->o == 'pa') $query->orderBy('price', 'asc');

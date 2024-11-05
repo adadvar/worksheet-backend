@@ -39,6 +39,8 @@ class CategoryController extends Controller
             $results[] = Category::where(['type' => 'subject', 'slug' => $r->subject])
                 ->whereHas('parent', function ($query) use ($r) {
                     $query->where('slug', $r->grade);
+                })->orWhereHas('parent.parent', function ($query) use ($r) {
+                    $query->where('slug', $r->grade);
                 })->first();
         }
 
