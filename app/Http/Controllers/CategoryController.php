@@ -32,7 +32,7 @@ class CategoryController extends Controller
         $results = [];
 
         if ($r->grade) {
-            $results[] = Category::where(['type' => 'grade', 'slug' => $r->grade])->first();
+            $results[] = Category::where(['type' => 'grade', 'slug' => $r->grade])->with('child')->first();
         }
 
         if ($r->subject) {
@@ -41,7 +41,7 @@ class CategoryController extends Controller
                     $query->where('slug', $r->grade);
                 })->orWhereHas('parent.parent', function ($query) use ($r) {
                     $query->where('slug', $r->grade);
-                })->first();
+                })->with('child')->first();
         }
 
         if ($r->topic) {
@@ -51,7 +51,7 @@ class CategoryController extends Controller
                 })
                 ->whereHas('parent.parent', function ($query) use ($r) {
                     $query->where('slug', $r->grade);
-                })->first();
+                })->with('child')->first();
         }
 
         return ($results);
