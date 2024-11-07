@@ -20,44 +20,73 @@ class CategoriesTableSeeder extends Seeder
         }
 
         $grades = [
-            ['name' => 'کلاس اول', 'slug' => 'aval-ebtedayi', 'type' => 'grade'],
-            ['name' => 'کلاس دوم', 'slug' => 'dovom-ebtedayi', 'type' => 'grade'],
-            ['name' => 'کلاس سوم', 'slug' => 'sevom-ebtedayi', 'type' => 'grade'],
-            ['name' => 'کلاس چهارم', 'slug' => 'chaharom-ebtedayi', 'type' => 'grade'],
-            ['name' => 'کلاس پنجم', 'slug' => 'panjom-ebtedayi', 'type' => 'grade'],
-            ['name' => 'کلاس ششم', 'slug' => 'sheshom-ebtedayi', 'type' => 'grade'],
+            ['name' => 'کلاس اول', 'slug' => 'first-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس دوم', 'slug' => 'dovom-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس سوم', 'slug' => 'sevom-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس چهارم', 'slug' => 'chaharom-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس پنجم', 'slug' => 'panjom-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس ششم', 'slug' => 'sheshom-elementary', 'type' => 'grade'],
         ];
 
         $subjects = [
-            'aval-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'first-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
             ],
-            'dovom-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'second-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
+                ['name' => 'هدیه‌های آسمان', 'slug' => 'hedyeh-aseman', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
             ],
-            'sevom-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'third-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
+                ['name' => 'هدیه‌های آسمان', 'slug' => 'hedyeh-aseman', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
+                ['name' => 'مطالعات اجتماعی', 'slug' => 'social-studies', 'type' => 'subject'],
             ],
-            'chaharom-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'fourth-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
+                ['name' => 'هدیه‌های آسمان', 'slug' => 'hedyeh-aseman', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
+                ['name' => 'مطالعات اجتماعی', 'slug' => 'social-studies', 'type' => 'subject'],
             ],
-            'panjom-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'fifth-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
+                ['name' => 'هدیه‌های آسمان', 'slug' => 'hedyeh-aseman', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
+                ['name' => 'مطالعات اجتماعی', 'slug' => 'social-studies', 'type' => 'subject'],
             ],
-            'sheshom-ebtedayi' => [
-                ['name' => 'ریاضی', 'slug' => 'riazi', 'type' => 'subject'],
+            'sixth-elementary' => [
+                ['name' => 'آموزش قرآن', 'slug' => 'quran', 'type' => 'subject'],
+                ['name' => 'هدیه‌های آسمان', 'slug' => 'hedyeh-aseman', 'type' => 'subject'],
                 ['name' => 'فارسی', 'slug' => 'farsi', 'type' => 'subject'],
+                ['name' => 'نگارش فارسی', 'slug' => 'farsi-writing', 'type' => 'subject'],
+                ['name' => 'ریاضی', 'slug' => 'math', 'type' => 'subject'],
+                ['name' => 'علوم تجربی', 'slug' => 'science', 'type' => 'subject'],
+                ['name' => 'مطالعات اجتماعی', 'slug' => 'social-studies', 'type' => 'subject'],
+                ['name' => 'تفکر و پژوهش', 'slug' => 'thinking-research', 'type' => 'subject'],
+                ['name' => 'کار و فناوری', 'slug' => 'work-technology', 'type' => 'subject'],
             ],
         ];
 
         $topics = [
-            'aval-ebtedayi' => [
-                'riazi' => [
+            'first-elementary' => [
+                'quran' => [
                     ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
@@ -66,8 +95,8 @@ class CategoriesTableSeeder extends Seeder
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
             ],
-            'dovom-ebtedayi' => [
-                'riazi' => [
+            'second-elementary' => [
+                'quran' => [
                     ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
@@ -76,8 +105,18 @@ class CategoriesTableSeeder extends Seeder
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
             ],
-            'sevom-ebtedayi' => [
-                'riazi' => [
+            'third-elementary' => [
+                'quran' => [
+                    ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
+                    ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
+                ],
+                'quran' => [
+                    ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
+                    ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
+                ],
+            ],
+            'fourth-elementary' => [
+                'quran' => [
                     ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
@@ -86,8 +125,8 @@ class CategoriesTableSeeder extends Seeder
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
             ],
-            'chaharom-ebtedayi' => [
-                'riazi' => [
+            'fifth-elementary' => [
+                'quran' => [
                     ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
@@ -96,18 +135,8 @@ class CategoriesTableSeeder extends Seeder
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
             ],
-            'panjom-ebtedayi' => [
-                'riazi' => [
-                    ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
-                    ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
-                ],
-                'farsi' => [
-                    ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
-                    ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
-                ],
-            ],
-            'sheshom-ebtedayi' => [
-                'riazi' => [
+            'sixth-elementary' => [
+                'quran' => [
                     ['name' => 'هنری', 'slug' => 'art', 'type' => 'topic'],
                     ['name' => 'رنگی', 'slug' => 'coloring', 'type' => 'topic'],
                 ],
