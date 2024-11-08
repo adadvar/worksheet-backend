@@ -4,6 +4,8 @@ namespace App\Http\Requests\Auth;
 
 use App\Rules\MobileRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ResendVerificationCodeRequest extends FormRequest
 {
@@ -31,12 +33,14 @@ class ResendVerificationCodeRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    protected function failedValidation(Validator $validator)
     {
-        return [
-            'mobile.required_without' => 'موبایل یا ایمیل خود را وارد کنید',
-            'email.required_without' => 'موبایل یا ایمیل خود را وارد کنید',
-            'email.email' => 'فرمت ایمیل اشتباه می باشد',
-        ];
+        // Get the first error message
+        $firstErrorMessage = $validator->errors()->first();
+
+        // Throw an exception with the first error message
+        throw new HttpResponseException(response()->json([
+            'message' => $firstErrorMessage,
+        ], 422));
     }
 }

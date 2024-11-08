@@ -39,11 +39,4 @@ class WorksheetUpdateRequest extends FormRequest
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
         ];
     }
-
-    public function messages()
-    {
-        return [
-            'slug.unique' => 'نام کاربرگ تکراری است، نام دیگری را انتخاب کنید.',
-        ];
-    }
 }
