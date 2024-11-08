@@ -339,6 +339,19 @@ class WorksheetController extends Controller
         return response(['message' => 'با موفقیت ثبت شد'], 200);
     }
 
+    public static function favourites(Request $r)
+    {
+        $user = auth()->user();
+        return response($user->favouriteWorksheets);
+    }
+
+    public static function recents(Request $r)
+    {
+        $user = auth()->user();
+        return response($user->recentWorksheets);
+    }
+
+
     private function convertDocxToPdf($docxPath, $pdfPath)
     {
         // Convert DOCX to PDF

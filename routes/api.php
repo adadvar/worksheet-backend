@@ -190,15 +190,6 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
         'show'
     ])->name('worksheet.show');
 
-    $router->match(['get', 'post'], '/{worksheet}/like', [
-        WorksheetController::class,
-        'like'
-    ])->name('worksheet.like');
-
-    $router->match(['get', 'post'], '/{worksheet}/unlike', [
-        WorksheetController::class,
-        'unlike'
-    ])->name('worksheet.unlike');
 
     Route::group(['middleware' => ['auth:sanctum']], function ($router) {
 
@@ -211,7 +202,6 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             WorksheetController::class,
             'showAdmin'
         ])->name('worksheet.admin.show');
-
 
         $router->post('/', [
             WorksheetController::class,
@@ -228,7 +218,6 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             'uploadFile'
         ])->name('worksheet.upload.file');
 
-
         $router->put('/{worksheet}', [
             WorksheetController::class,
             'update'
@@ -244,20 +233,30 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             'delete'
         ])->name('worksheet.delete');
 
-        // $router->get('/favourites', [
-        //     WorksheetController::class,
-        //     'favourites'
-        // ])->name('worksheet.favourites');
+        $router->match(['get', 'post'], '/{worksheet}/like', [
+            WorksheetController::class,
+            'like'
+        ])->name('worksheet.like');
+
+        $router->match(['get', 'post'], '/{worksheet}/unlike', [
+            WorksheetController::class,
+            'unlike'
+        ])->name('worksheet.unlike');
+
+        $router->get('/favourites', [
+            WorksheetController::class,
+            'favourites'
+        ])->name('worksheet.favourites');
 
         // $router->delete('/{worksheet}/delete-favourite', [
         //     WorksheetController::class,
         //     'deleteFavourite'
         // ])->name('worksheet.deleteFavourite');
 
-        // $router->get('/recents', [
-        //     WorksheetController::class,
-        //     'recents'
-        // ])->name('worksheet.recents');
+        $router->get('/recents', [
+            WorksheetController::class,
+            'recents'
+        ])->name('worksheet.recents');
 
         // $router->delete('/{worksheet}/delete-recent', [
         //     WorksheetController::class,

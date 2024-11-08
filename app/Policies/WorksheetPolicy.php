@@ -59,6 +59,7 @@ class WorksheetPolicy
             return WorksheetFavourite::where($conditions)->count() == 0;
         }
 
+        // return $this->deny('شما مجاز به این کار نیستید');
         return false;
     }
 
