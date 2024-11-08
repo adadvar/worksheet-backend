@@ -126,34 +126,34 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class);
     }
 
-    // public function favouriteWorksheets()
-    // {
-    //     return $this->hasManyThrough(
-    //         Advert::class,
-    //         AdvertFavourite::class,
-    //         'user_id', //advert_favorites.user_id
-    //         'id', //advert.id
-    //         'id', //user.id
-    //         'advert_id', //advert_favorites.advert_id
-    //     );
-    // }
+    public function favouriteWorksheets()
+    {
+        return $this->hasManyThrough(
+            Worksheet::class,
+            WorksheetFavourite::class,
+            'user_id', //worksheet_favorites.user_id
+            'id', //worksheet.id
+            'id', //user.id
+            'worksheet_id', //worksheet_favorites.worksheet_id
+        );
+    }
 
-    // public function recentAdverts()
-    // {
-    //     return $this->hasManyThrough(
-    //         Advert::class,
-    //         AdvertRecent::class,
-    //         'user_id', //advert_favorites.user_id
-    //         'id', //advert.id
-    //         'id', //user.id
-    //         'advert_id', //advert_favorites.advert_id
-    //     );
-    // }
+    public function recentWorksheets()
+    {
+        return $this->hasManyThrough(
+            Worksheet::class,
+            WorksheetRecent::class,
+            'user_id', //worksheet_favorites.user_id
+            'id', //worksheet.id
+            'id', //user.id
+            'worksheet_id', //worksheet_favorites.worksheet_id
+        );
+    }
 
-    // public function views()
-    // {
-    //     return $this
-    //         ->belongsToMany(Advert::class, 'advert_views')
-    //         ->withTimestamps();
-    // }
+    public function views()
+    {
+        return $this
+            ->belongsToMany(Worksheet::class, 'worksheet_views')
+            ->withTimestamps();
+    }
 }

@@ -31,7 +31,7 @@ class   WorksheetCreateRequest extends FormRequest
         return [
             'grade_id' => 'nullable|exists:categories,id',
             'subject_id' => 'nullable|exists:categories,id',
-            'topic_id' => 'nullable|exists:categories,id',       
+            'topic_id' => 'nullable|exists:categories,id',
             'name' => 'nullable|string|max:100',
             'slug' => 'nullable|string|unique:worksheets,slug|max:100',
             'description' => 'nullable|string',
@@ -39,6 +39,13 @@ class   WorksheetCreateRequest extends FormRequest
             'banner' => ['nullable', new UploadedBannerWorksheetId()],
             'file' => ['nullable', new UploadedFileWorksheetId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'slug.unique' => 'نام کاربرگ تکراری است، نام دیگری را انتخاب کنید.',
         ];
     }
 }

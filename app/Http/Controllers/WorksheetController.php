@@ -63,11 +63,9 @@ class WorksheetController extends Controller
             $whereIns['topic_id'] = $ids;
         }
 
-        if ($r->price) {
-            $prices = explode('-', $r->price);
-            if ($prices[0]) $conditions[] = ['price', '>=', $prices[0]];
-            if ($prices[1]) $conditions[] = ['price', '<=', $prices[1]];
-        }
+        // $prices = explode('-', $r->price);
+        // if ($prices[0]) $conditions[] = ['price', '>=', $prices[0]];
+        // if ($prices[1]) $conditions[] = ['price', '<=', $prices[1]];
 
         $query = Worksheet::query();
 
@@ -78,9 +76,16 @@ class WorksheetController extends Controller
 
         $query->with(['grade', 'subject', 'topic']);
 
-        if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
-        if ($r->o == 'pa') $query->orderBy('price', 'asc');
-        if ($r->o == 'pd') $query->orderBy('price', 'desc');
+        if ($r->sortBy === 'date-desc' || $r->sortBy) $query->orderBy('updated_at', 'desc');
+        if ($r->sortBy === 'view-desc') $query->orderBy('id', 'desc');
+        if ($r->sortBy === 'order-desc') $query->orderBy('id', 'desc');
+        if ($r->sortBy === 'price-asc') $query->orderBy('price', 'asc');
+        if ($r->sortBy === 'price-desc') $query->orderBy('price', 'desc');
+
+
+        // if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
+        // if ($r->o == 'pa') $query->orderBy('price', 'asc');
+        // if ($r->o == 'pd') $query->orderBy('price', 'desc');
 
         $perPage = $r->per_page ?? 10;
         $worksheets = $query->paginate($perPage);

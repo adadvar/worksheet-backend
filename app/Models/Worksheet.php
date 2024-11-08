@@ -31,6 +31,11 @@ class Worksheet extends Model
     // 'banners' => 'array',
     // ];
 
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
@@ -82,12 +87,26 @@ class Worksheet extends Model
         return Storage::disk('worksheets')->url($this->file);
     }
 
+    public function viewers()
+    {
+        return $this
+            ->belongsToMany(User::class, 'worksheet_views')
+            ->withTimestamps();
+    }
+
+    public static function views($userId)
+    {
+        return static::where('worksheets.user_id', $userId)
+            ->join('worksheet_views', 'worksheets.id', '=', 'worksheet_views.worksheet_id');
+    }
+
 
     public function toArray()
     {
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_link'] = $this->file_link;
+        $data['views'] = WorksheetView::where('worksheet_id', $this->id)->count();
 
         return $data;
     }
