@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
-use App\Events\VisitAdvert;
-use App\Models\AdvertView;
+use App\Events\VisitWorksheet;
+use App\Models\WorksheetView;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class AddVisitedAdvertLogToAdvertViewsTable
+class AddVisitedWorksheetLogToWorksheetViewsTable
 {
     /**
      * Create the event listener.
@@ -23,13 +23,13 @@ class AddVisitedAdvertLogToAdvertViewsTable
     /**
      * Handle the event.
      */
-    public function handle(VisitAdvert $event): void
+    public function handle(VisitWorksheet $event): void
     {
         try {
-            $advert = $event->getAdvert();
+            $worksheet = $event->getWorksheet();
             $conditions = [
                 'user_id' => auth('api')->id(),
-                'advert_id' => $advert->id,
+                'worksheet_id' => $worksheet->id,
                 ['created_at', '>', now()->subDays(1)]
             ];
             $clientIp = client_ip();
@@ -38,10 +38,10 @@ class AddVisitedAdvertLogToAdvertViewsTable
                 $conditions['user_ip'] = $clientIp;
             }
 
-            if (!AdvertView::where($conditions)->count()) {
-                AdvertView::create([
+            if (!WorksheetView::where($conditions)->count()) {
+                WorksheetView::create([
                     'user_id' => auth('api')->id(),
-                    'advert_id' => $advert->id,
+                    'worksheet_id' => $worksheet->id,
                     'user_ip' => $clientIp
                 ]);
             }

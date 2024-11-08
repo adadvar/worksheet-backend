@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VisitWorksheet;
 use App\Http\Requests\Worksheet\UploadWorksheetBannersRequest;
 use App\Http\Requests\Worksheet\UploadWorksheetFileRequest;
 use Illuminate\Support\Str;
@@ -10,6 +11,7 @@ use App\Http\Requests\Worksheet\WorksheetDeleteRequest;
 use App\Http\Requests\Worksheet\WorksheetUpdateRequest;
 use App\Models\Category;
 use App\Models\Worksheet;
+use App\Models\WorksheetFavourite;
 use Dompdf\Dompdf;
 use Exception;
 use Illuminate\Http\Request;
@@ -102,14 +104,27 @@ class WorksheetController extends Controller
         // event(new VisitWorksheet($worksheet));
         // $worksheet = $worksheet->load('user', 'category');
 
-        $worksheet = Worksheet::find($r->worksheet);
+        $worksheet = $r->worksheet;
 
         if (!$worksheet) {
             return response(['message' => 'Worksheet not found.'], 404);
         }
-        $worksheet->load('grade', 'subject', 'topic');
+        event(new VisitWorksheet($worksheet));
 
-        return $worksheet;
+        $worksheet->load('grade', 'subject', 'topic');
+        $worksheetData = $r->worksheet->toArray();
+
+        $conditions = [
+            'worksheet_id' => $r->worksheet->id,
+            'user_id' => auth('api')->check() ? auth('api')->id() : null,
+        ];
+
+        if (!auth('api')->check()) {
+            $conditions['user_ip'] = client_ip();
+        }
+        $worksheetData['liked'] = WorksheetFavourite::where($conditions)->count() > 0;
+
+        return $worksheetData;
     }
 
     public static function uploadBanner(UploadWorksheetBannersRequest $r)

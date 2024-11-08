@@ -82,9 +82,9 @@ class Worksheet extends Model
         return Storage::disk('worksheets')->url($this->banner);
     }
 
-    public function getFileLinkAttribute()
+    public function getFilePdfLinkAttribute()
     {
-        return Storage::disk('worksheets')->url($this->file);
+        return Storage::disk('worksheets')->url($this->file_pdf);
     }
 
     public function viewers()
@@ -105,7 +105,7 @@ class Worksheet extends Model
     {
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
-        $data['file_link'] = $this->file_link;
+        $data['file_pdf_link'] = $this->file_pdf_link;
         $data['views'] = WorksheetView::where('worksheet_id', $this->id)->count();
 
         return $data;

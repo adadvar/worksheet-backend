@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Advert;
+use App\Models\Worksheet;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,18 +11,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class VisitAdvert
+class VisitWorksheet
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $advert;
+    private $worksheet;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Advert $advert)
+    public function __construct(Worksheet $worksheet)
     {
-        $this->advert = $advert;
+        $this->worksheet = $worksheet;
     }
 
     /**
@@ -38,10 +38,10 @@ class VisitAdvert
     }
 
     /**
-     * @return Advert
+     * @return Worksheet
      */
-    public function getAdvert(): Advert
+    public function getWorksheet(): Worksheet
     {
-        return $this->advert;
+        return $this->worksheet;
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
-use App\Events\VisitAdvert;
-use App\Models\AdvertRecent;
+use App\Events\VisitWorksheet;
+use App\Models\WorksheetRecent;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class AddVisitedAdvertLogToAdvertRecentsTable
+class AddVisitedWorksheetLogToWorksheetRecentsTable
 {
     /**
      * Create the event listener.
@@ -23,24 +23,24 @@ class AddVisitedAdvertLogToAdvertRecentsTable
     /**
      * Handle the event.
      */
-    public function handle(VisitAdvert $event): void
+    public function handle(VisitWorksheet $event): void
     {
         if (auth('api')->check()) {
             try {
-                $advert = $event->getAdvert();
+                $worksheet = $event->getWorksheet();
                 $userId = auth('api')->user()->id;
                 $conditions = [
                     'user_id' => $userId,
-                    'advert_id' => $advert->id,
+                    'worksheet_id' => $worksheet->id,
                 ];
-                if (!AdvertRecent::where($conditions)->count()) {
-                    $advertRecent = AdvertRecent::where(['user_id' => $userId]);
-                    if ($advertRecent->count() > 30) {
-                        $advertRecent->first()->delete();
+                if (!WorksheetRecent::where($conditions)->count()) {
+                    $worksheetRecent = WorksheetRecent::where(['user_id' => $userId]);
+                    if ($worksheetRecent->count() > 30) {
+                        $worksheetRecent->first()->delete();
                     }
-                    AdvertRecent::create([
+                    WorksheetRecent::create([
                         'user_id' => $userId,
-                        'advert_id' => $advert->id,
+                        'worksheet_id' => $worksheet->id,
                     ]);
                 }
             } catch (Exception $exception) {
