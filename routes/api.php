@@ -190,15 +190,15 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
         'show'
     ])->name('worksheet.show');
 
-    // $router->match(['get', 'post'], '/{worksheet}/like', [
-    //     WorksheetController::class,
-    //     'like'
-    // ])->name('worksheet.like');
+    $router->match(['get', 'post'], '/{worksheet}/like', [
+        WorksheetController::class,
+        'like'
+    ])->name('worksheet.like');
 
-    // $router->match(['get', 'post'], '/{worksheet}/unlike', [
-    //     WorksheetController::class,
-    //     'unlike'
-    // ])->name('worksheet.unlike');
+    $router->match(['get', 'post'], '/{worksheet}/unlike', [
+        WorksheetController::class,
+        'unlike'
+    ])->name('worksheet.unlike');
 
     Route::group(['middleware' => ['auth:sanctum']], function ($router) {
 

@@ -8,6 +8,8 @@ use App\Http\Requests\Worksheet\UploadWorksheetFileRequest;
 use Illuminate\Support\Str;
 use App\Http\Requests\Worksheet\WorksheetCreateRequest;
 use App\Http\Requests\Worksheet\WorksheetDeleteRequest;
+use App\Http\Requests\Worksheet\WorksheetLikeRequest;
+use App\Http\Requests\Worksheet\WorksheetUnlikeRequest;
 use App\Http\Requests\Worksheet\WorksheetUpdateRequest;
 use App\Models\Category;
 use App\Models\Worksheet;
@@ -15,6 +17,7 @@ use App\Models\WorksheetFavourite;
 use Dompdf\Dompdf;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -306,6 +309,34 @@ class WorksheetController extends Controller
             Log::error($e);
             return response(['message' => 'خطایی رخ داده است'], 500);
         }
+    }
+
+    public static function like(WorksheetLikeRequest $r)
+    {
+        //ابتدا باید وضعیت worksheet به accepted تغییر کند
+        WorksheetFavourite::create([
+            'user_id' => Auth::guard('api')->id(),
+            'user_ip' => client_ip(),
+            'worksheet_id' => $r->worksheet->id,
+        ]);
+
+        return response(['message' => 'با موفقیت ثبت شد'], 200);
+    }
+
+    public static function unlike(WorksheetUnlikeRequest $r)
+    {
+        $user = auth('api')->user();
+        $conditions = [
+            'worksheet_id' => $r->worksheet->id,
+            'user_id' => $user ? $user->id : null
+        ];
+
+        if (empty($user)) {
+            $conditions['user_ip'] = client_ip();
+        }
+
+        WorksheetFavourite::where($conditions)->delete();
+        return response(['message' => 'با موفقیت ثبت شد'], 200);
     }
 
     private function convertDocxToPdf($docxPath, $pdfPath)

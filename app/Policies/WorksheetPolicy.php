@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\Worksheet;
+use App\Models\WorksheetFavourite;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class WorksheetPolicy
@@ -43,44 +44,45 @@ class WorksheetPolicy
         return $user->isAdmin();
     }
 
-    // public function like(User $user = null, Worksheet $worksheet = null)
-    // {
-    //     if ($worksheet && $worksheet->isAccepted()) {
-    //         $conditions = [
-    //             'advert_id' => $worksheet->id,
-    //             'user_id' => $user ? $user->id : null
-    //         ];
+    public function like(User $user = null, Worksheet $worksheet = null)
+    {
+        // if ($worksheet && $worksheet->isAccepted()) {
+        if ($worksheet) {
+            $conditions = [
+                'worksheet_id' => $worksheet->id,
+                'user_id' => $user ? $user->id : null
+            ];
 
-    //         if (empty($user)) {
-    //             $conditions['user_ip'] = client_ip();
-    //         }
-    //         return AdvertFavourite::where($conditions)->count() == 0;
-    //     }
+            if (empty($user)) {
+                $conditions['user_ip'] = client_ip();
+            }
+            return WorksheetFavourite::where($conditions)->count() == 0;
+        }
 
-    //     return false;
-    // }
+        return false;
+    }
 
-    // public function unlike(User $user = null, Worksheet $worksheet = null)
-    // {
-    //     $conditions = [
-    //         'Advert_id' => $worksheet->id,
-    //         'user_id' => $user ? $user->id : null
-    //     ];
+    public function unlike(User $user = null, Worksheet $worksheet = null)
+    {
+        $conditions = [
+            'Worksheet_id' => $worksheet->id,
+            'user_id' => $user ? $user->id : null
+        ];
 
-    //     if (empty($user)) {
-    //         $conditions['user_ip'] = client_ip();
-    //     }
+        if (empty($user)) {
+            $conditions['user_ip'] = client_ip();
+        }
 
-    //     return AdvertFavourite::where($conditions)->count();
-    // }
+        return WorksheetFavourite::where($conditions)->count();
+    }
 
     // public function deleteFavourite(User $user = null, Worksheet $worksheet = null)
     // {
-    //     return $user->favouriteAdverts->find($worksheet->id);
+    //     return $user->favouriteWorksheets->find($worksheet->id);
     // }
 
     // public function deleteRecent(User $user = null, Worksheet $worksheet = null)
     // {
-    //     return $user->recentAdverts->find($worksheet->id);
+    //     return $user->recentWorksheets->find($worksheet->id);
     // }
 }

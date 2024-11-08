@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Advert;
+namespace App\Http\Requests\Worksheet;
 
-use App\Models\Advert;
+use App\Models\Worksheet;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class AdvertUnlikeRequest extends FormRequest
+class WorksheetLikeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,8 +15,8 @@ class AdvertUnlikeRequest extends FormRequest
      */
     public function authorize()
     {
-        return Gate::forUser(auth()->user())
-            ->allows('unlike', $this->advert);
+        return Gate::forUser(auth('api')->user())
+            ->allows('like', $this->worksheet);
     }
 
     /**
