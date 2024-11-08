@@ -21,11 +21,11 @@ class CategoriesTableSeeder extends Seeder
 
         $grades = [
             ['name' => 'کلاس اول', 'slug' => 'first-elementary', 'type' => 'grade'],
-            ['name' => 'کلاس دوم', 'slug' => 'dovom-elementary', 'type' => 'grade'],
-            ['name' => 'کلاس سوم', 'slug' => 'sevom-elementary', 'type' => 'grade'],
-            ['name' => 'کلاس چهارم', 'slug' => 'chaharom-elementary', 'type' => 'grade'],
-            ['name' => 'کلاس پنجم', 'slug' => 'panjom-elementary', 'type' => 'grade'],
-            ['name' => 'کلاس ششم', 'slug' => 'sheshom-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس دوم', 'slug' => 'second-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس سوم', 'slug' => 'third-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس چهارم', 'slug' => 'fourth-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس پنجم', 'slug' => 'fifth-elementary', 'type' => 'grade'],
+            ['name' => 'کلاس ششم', 'slug' => 'sixth-elementary', 'type' => 'grade'],
         ];
 
         $subjects = [
