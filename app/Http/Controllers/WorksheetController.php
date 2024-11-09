@@ -80,9 +80,9 @@ class WorksheetController extends Controller
         }
 
         $query->with(['grade', 'subject', 'topic']);
-
+        $query->withCount('viewers as views_count');
         if ($r->sortBy === 'date-desc' || $r->sortBy) $query->orderBy('updated_at', 'desc');
-        if ($r->sortBy === 'view-desc') $query->orderBy('id', 'desc');
+        if ($r->sortBy === 'view-desc') $query->orderBy('views_count', 'desc');
         if ($r->sortBy === 'order-desc') $query->orderBy('id', 'desc');
         if ($r->sortBy === 'price-asc') $query->orderBy('price', 'asc');
         if ($r->sortBy === 'price-desc') $query->orderBy('price', 'desc');

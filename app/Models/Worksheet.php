@@ -100,13 +100,17 @@ class Worksheet extends Model
             ->join('worksheet_views', 'worksheets.id', '=', 'worksheet_views.worksheet_id');
     }
 
+    public function getViewsCountAttribute()
+    {
+        return WorksheetView::where('worksheet_id', $this->id)->count();
+    }
 
     public function toArray()
     {
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_pdf_link'] = $this->file_pdf_link;
-        $data['views'] = WorksheetView::where('worksheet_id', $this->id)->count();
+        $data['views'] = $this->views_count;
 
         return $data;
     }
