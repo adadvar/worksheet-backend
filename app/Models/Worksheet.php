@@ -25,7 +25,7 @@ class Worksheet extends Model
         'publish_at'
     ];
 
-    protected $appends = ['age'];
+    protected $appends = ['age', 'views_count'];
 
     // protected $casts = [
     // 'banners' => 'array',
@@ -110,7 +110,7 @@ class Worksheet extends Model
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_pdf_link'] = $this->file_pdf_link;
-        $data['views'] = $this->views_count;
+        // $data['views_count'] = $this->views_count;
 
         return $data;
     }

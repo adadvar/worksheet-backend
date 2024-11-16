@@ -37,20 +37,26 @@ class CategoryController extends Controller
 
         if ($r->subject) {
             $results[] = Category::where(['type' => 'subject', 'slug' => $r->subject])
-                ->whereHas('parent', function ($query) use ($r) {
-                    $query->where('slug', $r->grade);
-                })->orWhereHas('parent.parent', function ($query) use ($r) {
-                    $query->where('slug', $r->grade);
+                ->where(function ($query) use ($r) {
+
+                    $query->whereHas('parent', function ($query) use ($r) {
+                        $query->where('slug', $r->grade);
+                    })->orWhereHas('parent.parent', function ($query) use ($r) {
+                        $query->where('slug', $r->grade);
+                    });
                 })->with('child')->first();
         }
 
         if ($r->topic) {
             $results[] = Category::where(['type' => 'topic', 'slug' => $r->topic])
-                ->whereHas('parent', function ($query) use ($r) {
-                    $query->where('slug', $r->subject);
-                })
-                ->whereHas('parent.parent', function ($query) use ($r) {
-                    $query->where('slug', $r->grade);
+                ->where(function ($query) use ($r) {
+
+                    $query->whereHas('parent', function ($query) use ($r) {
+                        $query->where('slug', $r->subject);
+                    })
+                        ->whereHas('parent.parent', function ($query) use ($r) {
+                            $query->where('slug', $r->grade);
+                        });
                 })->with('child')->first();
         }
 

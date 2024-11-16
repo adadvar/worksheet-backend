@@ -29,7 +29,7 @@ class VerificationCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'کد تایید ایمیل شده دیوار',
+            subject: 'کد تایید ایمیل شده برگینو',
         );
     }
 
