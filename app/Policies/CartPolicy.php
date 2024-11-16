@@ -27,7 +27,7 @@ class CartPolicy
 
     public function show(User $user, Cart $cart = null)
     {
-        return $user->isAdmin() || ($cart && $user->id == $cart->user_id);
+        return $user->isAdmin() || ($cart ? $user->id == $cart->user_id : true);
     }
 
 

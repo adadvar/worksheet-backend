@@ -105,12 +105,20 @@ class Worksheet extends Model
         return WorksheetView::where('worksheet_id', $this->id)->count();
     }
 
+    // public function getIsInCartAttribute()
+    // {
+    //     return $this->cartItems()
+    //         ->where('cart_id', auth()->user()->cart->id)
+    //         ->exists();
+    // }
+
     public function toArray()
     {
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_pdf_link'] = $this->file_pdf_link;
         // $data['views_count'] = $this->views_count;
+        // $data['is_in_cart'] = $this->is_in_cart;
 
         return $data;
     }

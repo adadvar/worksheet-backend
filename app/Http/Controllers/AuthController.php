@@ -32,6 +32,8 @@ class AuthController extends Controller
                 ], 401);
             }
 
+            if (!$user->cart) $user->cart()->create();
+
             $token = $user->createToken('myapptoken')->plainTextToken;
 
             return response(['user' => $user, 'token' => $token, 'message' => 'با موفقیت وارد شدید'], 200);
@@ -200,6 +202,8 @@ class AuthController extends Controller
 
             $user->verify_code = null;
             $user->save();
+
+            if (!$user->cart) $user->cart()->create();
 
             $token = $user->createToken('myapptoken')->plainTextToken;
 

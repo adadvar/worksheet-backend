@@ -16,7 +16,9 @@ class CartController extends Controller
 
     public function current(CartShowRequest $r)
     {
-        $cart = $r->user()->cart;
+        $user = $r->user();
+        $cart = $user->cart ?? $user->cart()->create();
+
         return response()->json($cart->load('cartItems'));
     }
 
@@ -25,13 +27,22 @@ class CartController extends Controller
         try {
             DB::beginTransaction();
 
-            $cart = $r->user()->cart ?? $r->user()->cart()->create();
+            $cart = $r->user()->cart;
 
-            $cartItem = $cart->cartItems()->create([
-                'worksheet_id' => $r->worksheet_id,
-                'quantity' => $r->quantity,
-                'price' => $r->price,
-            ]);
+            $existingCartItem = $cart->cartItems()->where('worksheet_id', $r->worksheet_id)->first();
+
+            if ($existingCartItem) {
+                $existingCartItem->update([
+                    'price' => $r->price,
+                ]);
+
+                $cartItem = $existingCartItem;
+            } else {
+                $cartItem = $cart->cartItems()->create([
+                    'worksheet_id' => $r->worksheet_id,
+                    'price' => $r->price,
+                ]);
+            }
 
             DB::commit();
 
@@ -47,7 +58,7 @@ class CartController extends Controller
     {
         try {
             $cartItem = $r->cartItem;
-            $cartItem->update($r->only(['quantity', 'price']));
+            $cartItem->update($r->only(['price']));
 
             return response()->json($cartItem);
         } catch (Exception $e) {

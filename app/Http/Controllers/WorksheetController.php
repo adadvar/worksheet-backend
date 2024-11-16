@@ -127,6 +127,14 @@ class WorksheetController extends Controller
         }
         $worksheetData['liked'] = WorksheetFavourite::where($conditions)->count() > 0;
 
+        if (auth('api')->check()) {
+            $worksheetData['is_in_cart'] = $worksheet->cartItems()
+                ->where('cart_id', auth('api')->user()->cart->id)
+                ->exists();
+        } else {
+            $worksheetData['is_in_cart'] = false;
+        }
+
         return $worksheetData;
     }
 
