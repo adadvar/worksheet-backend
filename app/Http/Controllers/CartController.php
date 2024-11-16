@@ -19,7 +19,7 @@ class CartController extends Controller
         $user = $r->user();
         $cart = $user->cart ?? $user->cart()->create();
 
-        return response()->json($cart->load('cartItems'));
+        return response($cart->load('cartItems'));
     }
 
     public function create(CartCreateRequest $r)
@@ -35,22 +35,23 @@ class CartController extends Controller
                 $existingCartItem->update([
                     'price' => $r->price,
                 ]);
-
-                $cartItem = $existingCartItem;
             } else {
-                $cartItem = $cart->cartItems()->create([
+                $cart->cartItems()->create([
                     'worksheet_id' => $r->worksheet_id,
+                    'prev_price' => $r->price,
                     'price' => $r->price,
                 ]);
             }
 
             DB::commit();
-
-            return response()->json($cartItem, 201);
+            if ($existingCartItem)
+                return response(['message' => 'کاربرگ در سبد خرید وجود دارد'], 500);
+            if (!$existingCartItem)
+                return response(['message' => 'با موفقیت به سبد خرید اضافه شد'], 201);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
+            return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 
@@ -60,23 +61,31 @@ class CartController extends Controller
             $cartItem = $r->cartItem;
             $cartItem->update($r->only(['price']));
 
-            return response()->json($cartItem);
+            return response($cartItem);
         } catch (Exception $e) {
             Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
+            return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 
     public function delete(CartDeleteRequest $r)
     {
         try {
-            $cartItem = $r->cartItem;
-            $cartItem->delete();
-
-            return response()->json(['message' => 'آیتم سبد خرید با موفقیت حذف شد!'], 200);
+            $cart = $r->user()->cart;
+            $worksheet = $r->worksheet;
+            $cartItem = CartItem::where([
+                'cart_id' => $cart->id,
+                'worksheet_id' => $worksheet->id,
+            ])->first();
+            if ($cartItem) {
+                $cartItem->delete();
+                return response(['message' => 'آیتم سبد خرید با موفقیت حذف شد!'], 200);
+            } else {
+                return response(['message' => 'آیتم سبد خرید پیدا نشد!'], 404);
+            }
         } catch (Exception $e) {
             Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
+            return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 }

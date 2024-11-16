@@ -288,7 +288,7 @@ Route::group(['prefix' => 'cart'], function ($router) {
             'update'
         ])->name('cartitem.update');
 
-        $router->delete('/{cartItem}', [
+        $router->delete('/{worksheet}', [
             CartController::class,
             'delete'
         ])->name('cartitem.delete');

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('cart_id');
             $table->unsignedBigInteger('worksheet_id');
+            $table->decimal('prev_price', 15, 2)->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->timestamps();
 
