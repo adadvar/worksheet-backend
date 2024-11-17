@@ -27,7 +27,6 @@ class CartCreateRequest extends FormRequest
     {
         return [
             'worksheet_id' => 'required|exists:worksheets,id',
-            'quantity' => 'nullable|integer',
             'price' => 'nullable|numeric',
         ];
     }
