@@ -19,7 +19,14 @@ class CartController extends Controller
         $user = $r->user();
         $cart = $user->cart ?? $user->cart()->create();
 
-        return response($cart->load('cartItems'));
+        $cart->cartItems->map(function ($cartItem) {
+            $worksheet = $cartItem->worksheet;
+            $cartItem->price = $worksheet->price;
+            $cartItem->save();
+        });
+
+        $cart->load('cartItems');
+        return response($cart);
     }
 
     public function create(CartCreateRequest $r)

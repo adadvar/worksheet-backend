@@ -81,7 +81,7 @@ class WorksheetController extends Controller
 
         $query->with(['grade', 'subject', 'topic']);
         $query->withCount('viewers as views_count');
-        if ($r->sortBy === 'date-desc' || $r->sortBy) $query->orderBy('updated_at', 'desc');
+        if ($r->sortBy === 'date-desc' || !$r->sortBy) $query->orderBy('updated_at', 'desc');
         if ($r->sortBy === 'view-desc') $query->orderBy('views_count', 'desc');
         if ($r->sortBy === 'order-desc') $query->orderBy('id', 'desc');
         if ($r->sortBy === 'price-asc') $query->orderBy('price', 'asc');
@@ -328,7 +328,7 @@ class WorksheetController extends Controller
             'worksheet_id' => $r->worksheet->id,
         ]);
 
-        return response(['message' => 'با موفقیت ثبت شد'], 200);
+        return response(['message' => 'به علاقه مندی ها اضافه شد'], 200);
     }
 
     public static function unlike(WorksheetUnlikeRequest $r)
@@ -344,7 +344,7 @@ class WorksheetController extends Controller
         }
 
         WorksheetFavourite::where($conditions)->delete();
-        return response(['message' => 'با موفقیت ثبت شد'], 200);
+        return response(['message' => 'از علاقه مندی ها حذف شد'], 200);
     }
 
     public static function favourites(Request $r)
