@@ -359,6 +359,26 @@ class WorksheetController extends Controller
         return response($user->recentWorksheets);
     }
 
+    public function downloadPdf(Worksheet $worksheet)
+    {
+        if (!$worksheet->isPaid()) {
+            return response()->json(['message' => 'دسترسی غیرمجاز!'], 403);
+        }
+
+        $filePath = Storage::disk('worksheets')->path($worksheet->file_pdf);
+        return response()->download($filePath);
+    }
+
+    public function downloadWord(Worksheet $worksheet)
+    {
+        if (!$worksheet->isPaid()) {
+            return response()->json(['message' => 'دسترسی غیرمجاز!'], 403);
+        }
+
+        $filePath = Storage::disk('worksheets')->path($worksheet->file_word);
+        return response()->download($filePath);
+    }
+
 
     private function convertDocxToPdf($docxPath, $pdfPath)
     {

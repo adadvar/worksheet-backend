@@ -263,6 +263,17 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
         //     'deleteRecent'
         // ])->name('worksheet.deleteRecent');
 
+        $router->get('/{worksheet}/download-pdf', [
+            WorksheetController::class,
+            'downloadPdf'
+        ])->name('worksheet.downloadPdf');
+
+        $router->get('/{worksheet}/download-word', [
+            WorksheetController::class,
+            'downloadWord'
+        ])->name('worksheet.downloadWord');
+
+
         $router->get('/my', [
             WorksheetController::class,
             'my'
@@ -318,10 +329,10 @@ Route::group(['prefix' => 'order'], function ($router) {
         //     'update'
         // ])->name('order.update');
 
-        $router->post('/{order}/pay', [
+        $router->post('/{order}/payment', [
             OrderController::class,
-            'pay'
-        ])->name('order.pay');
+            'payment'
+        ])->name('order.payment');
 
         $router->get('/payment/callback', [
             OrderController::class,

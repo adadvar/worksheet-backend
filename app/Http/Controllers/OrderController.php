@@ -118,7 +118,7 @@ class OrderController extends Controller
         }
     }
 
-    // public function pay(Order $order)
+    // public function payment(Order $order)
     // {
     //     // فقط اجازه پرداخت برای سفارش با وضعیت pending
     //     if ($order->status !== Order::TYPE_PENDING) {

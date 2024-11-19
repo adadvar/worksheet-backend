@@ -27,6 +27,17 @@ class Worksheet extends Model
 
     protected $appends = ['age', 'views_count'];
 
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var array<int, string>
+     */
+    protected $hidden = [
+        'file_word',
+        'file_pdf'
+    ];
+
+
     // protected $casts = [
     // 'banners' => 'array',
     // ];
@@ -84,7 +95,32 @@ class Worksheet extends Model
 
     public function getFilePdfLinkAttribute()
     {
-        return Storage::disk('worksheets')->url($this->file_pdf);
+        if ($this->isPaid())
+            return Storage::disk('worksheets')->url($this->file_pdf);
+        return null;
+    }
+
+    public function getFileWordLinkAttribute()
+    {
+        if ($this->isPaid())
+            return Storage::disk('worksheets')->url($this->file_word);
+        return null;
+    }
+
+    public function isPaid()
+    {
+        $user = auth('api')->user();
+        if ($user) {
+            $orderItem = OrderItem::where('worksheet_id', $this->id)
+                ->whereHas('order', function ($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                        ->where('status', Order::TYPE_PAID);
+                })
+                ->first();
+
+            return $orderItem !== null;
+        }
+        return false;
     }
 
     public function viewers()
@@ -117,6 +153,7 @@ class Worksheet extends Model
         $data = parent::toArray();
         $data['banner_link'] = $this->banner_link;
         $data['file_pdf_link'] = $this->file_pdf_link;
+        $data['file_word_link'] = $this->file_word_link;
         // $data['views_count'] = $this->views_count;
         // $data['is_in_cart'] = $this->is_in_cart;
 
