@@ -3,7 +3,7 @@
 /public/build
 /public/hot
 /public/storage
-/public/worksheets
+# /public/banners
 /storage/*.key
 /vendor
 .env
@@ -21,3 +21,5 @@ yarn-error.log
 .vercel
 *.rar
 *.zip
+*.jpg
+*.pdf

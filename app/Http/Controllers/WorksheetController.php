@@ -145,7 +145,7 @@ class WorksheetController extends Controller
 
             $bannerName = time() . Str::random(10) . '-banner.' . $banner->getClientOriginalExtension();
             // Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
-            Storage::disk('worksheets')->putFileAs('tmp', $banner, $bannerName);
+            Storage::disk('banners')->putFileAs('tmp', $banner, $bannerName);
 
             DB::table('temporary_files')->insert([
                 'file_name' => $bannerName,
@@ -199,7 +199,7 @@ class WorksheetController extends Controller
             if ($r->has('banner') && !empty($r->banner)) {
                 $bannerName = $r->banner;
                 // Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
-                Storage::disk('worksheets')->move('tmp/' . $bannerName, $bannerName);
+                Storage::disk('banners')->move('tmp/' . $bannerName, $bannerName);
 
                 $worksheet->banner = $bannerName;
 
@@ -211,10 +211,11 @@ class WorksheetController extends Controller
                 $docxPath = 'tmp/' . $fileName;
                 $pdfPath = str_replace('.docx', '.pdf', $fileName);
 
-                $this->convertDocxToPdf($docxPath, $pdfPath);
+                // $this->convertDocxToPdf($docxPath, $pdfPath);
 
                 // Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
                 Storage::disk('worksheets')->move($docxPath, $fileName);
+                // Storage::disk('worksheets')->move('tmp/' . $pdfPath, $pdfPath);
 
                 $worksheet->file_word = $fileName;
                 $worksheet->file_pdf = $fileName;
@@ -246,10 +247,10 @@ class WorksheetController extends Controller
             if ($r->has('banner') && !empty($r->banner)) {
                 if ($worksheet->banner) {
                     // Storage::delete('worksheets/' . $worksheet->banner);
-                    Storage::disk('worksheets')->delete($worksheet->banner);
+                    Storage::disk('banners')->delete($worksheet->banner);
                 }
                 // Storage::move('worksheets/tmp/' . $data['banner'], 'worksheets/' . $data['banner']);
-                Storage::disk('worksheets')->move('tmp/' . $data['banner'], $data['banner']);
+                Storage::disk('banners')->move('tmp/' . $data['banner'], $data['banner']);
             }
 
             if ($r->has('file') && !empty($r->file)) {
@@ -264,10 +265,11 @@ class WorksheetController extends Controller
                 $pdfPath = str_replace('.docx', '.pdf', $fileName);
 
                 // Convert DOCX to PDF
-                $this->convertDocxToPdf($docxPath, $pdfPath);
+                // $this->convertDocxToPdf($docxPath, $pdfPath);
 
                 // Move DOCX file
                 Storage::disk('worksheets')->move($docxPath, $fileName);
+                // Storage::disk('worksheets')->move('tmp/' . $pdfPath, $pdfPath);
 
                 $worksheet->file_word = $fileName;
                 $worksheet->pdf_file = $pdfPath;
@@ -300,7 +302,8 @@ class WorksheetController extends Controller
             $worksheet = $r->worksheet;
             if ($worksheet->banner) {
                 // Storage::delete('worksheets/' . $worksheet->banner);
-                Storage::disk('worksheets')->delete($worksheet->banner);
+                // Storage::disk('worksheets')->delete($worksheet->banner);
+                Storage::disk('public')->delete('worksheets/' . $worksheet->banner);
             }
 
             if ($worksheet->file_word) {

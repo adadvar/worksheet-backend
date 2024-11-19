@@ -32,10 +32,10 @@ class Worksheet extends Model
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-        'file_word',
-        'file_pdf'
-    ];
+    // protected $hidden = [
+    //     'file_word',
+    //     'file_pdf'
+    // ];
 
 
     // protected $casts = [
@@ -90,7 +90,7 @@ class Worksheet extends Model
 
     public function getBannerLinkAttribute()
     {
-        return Storage::disk('worksheets')->url($this->banner);
+        return Storage::disk('banners')->url($this->banner);
     }
 
     public function getFilePdfLinkAttribute()

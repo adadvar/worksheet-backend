@@ -58,8 +58,16 @@ return [
 
         'worksheets' => [
             'driver' => 'local',
-            'root' => public_path('worksheets'),
-            'url' => env('APP_URL') . '/worksheets',
+            'root' => storage_path('app/worksheets'),
+            'url' => env('APP_URL') . '/storage/worksheets',
+            'visibility' => 'private',
+            'throw' => false,
+        ],
+
+        'banners' => [
+            'driver' => 'local',
+            'root' => public_path('banners'),
+            'url' => env('APP_URL') . '/banners',
             'throw' => false,
         ],
 
