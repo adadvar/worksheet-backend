@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->decimal('total_price', 15, 2)->nullable();
             $table->enum('status', Order::TYPES)->default(Order::TYPE_PENDING);
+            $table->string('transaction_id')->nullable();
             $table->timestamps();
 
             $table->softDeletes();

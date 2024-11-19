@@ -20,40 +20,64 @@ class OrderController extends Controller
     public function list(OrderListRequest $r)
     {
         $orders = Order::with('orderItems')->get();
-        return response()->json($orders);
+        return response($orders);
     }
 
-    public function create(OrderCreateRequest $request)
+    public function current(Request $request)
+    {
+        $user = $request->user();
+        $order = $user->orders()->where('status', Order::TYPE_PENDING)->first();
+
+        if (!$order) {
+            return response(['message' => 'سفارش فعلی یافت نشد!'], 404);
+        }
+
+        return response($order);
+    }
+
+    public function createOrUpdate(OrderCreateRequest $request)
     {
         try {
             DB::beginTransaction();
 
-            $order = Order::create([
-                'user_id' => $request->user_id,
-                'total_price' => $request->total_price,
-                'status' => $request->status,
-            ]);
+            $user = $request->user();
+            $cart = $user->cart;
 
-            $cart = Cart::where('user_id', $request->user_id)->first();
-            if ($cart) {
-                foreach ($cart->cartItems as $item) {
-                    OrderItem::create([
-                        'order_id' => $order->id,
-                        'worksheet_id' => $item->worksheet_id,
-                        'quantity' => $item->quantity,
-                        'price' => $item->price,
-                    ]);
-                }
-                $cart->cartItems()->delete();
+            if (!$cart || $cart->cartItems->isEmpty()) {
+                return response(['message' => 'سبد خرید خالی است!'], 400);
+            }
+
+            $order = $user->orders()->where('status', Order::TYPE_PENDING)->first();
+
+            if (!$order) {
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'total_price' => $cart->cartItems->sum('price'),
+                    'status' => Order::TYPE_PENDING,
+                ]);
+            } else {
+                $order->update([
+                    'total_price' => $cart->cartItems->sum('price'),
+                ]);
+            }
+
+            $order->orderItems()->delete();
+
+            foreach ($cart->cartItems as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'worksheet_id' => $item->worksheet_id,
+                    'price' => $item->price,
+                ]);
             }
 
             DB::commit();
 
-            return response()->json($order, 201);
+            return response(['message' => 'سفارش با موفقیت ایجاد شد'], 201);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
+            return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
 
@@ -66,48 +90,7 @@ class OrderController extends Controller
     public function show(OrderShowRequest $r)
     {
         $order = $r->order;
-        return response()->json($order);
-    }
-
-    /**
-     * Update the specified order in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(OrderUpdateRequest $r)
-    {
-        try {
-            DB::beginTransaction();
-
-            $order = $r->order;
-            $order->update($r->only(['user_id', 'total_price', 'status']));
-
-            if ($r->has('items')) {
-                foreach ($r->items as $item) {
-                    if (isset($item['id'])) {
-                        $orderItem = OrderItem::findOrFail($item['id']);
-                        $orderItem->update($item);
-                    } else {
-                        OrderItem::create([
-                            'order_id' => $order->id,
-                            'worksheet_id' => $item['worksheet_id'],
-                            'quantity' => $item['quantity'],
-                            'price' => $item['price'],
-                        ]);
-                    }
-                }
-            }
-
-            DB::commit();
-
-            return response()->json($order);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
-        }
+        return response($order);
     }
 
     /**
@@ -120,12 +103,75 @@ class OrderController extends Controller
     {
         try {
             $order = $r->order;
+
+            // فقط اجازه حذف سفارش با وضعیت pending
+            if ($order->status !== Order::TYPE_PENDING) {
+                return response(['message' => 'امکان حذف این سفارش وجود ندارد!'], 403);
+            }
+
             $order->delete();
 
-            return response()->json(['message' => 'سفارش با موفقیت حذف شد!'], 200);
+            return response(['message' => 'سفارش با موفقیت حذف شد!'], 200);
         } catch (Exception $e) {
             Log::error($e);
-            return response()->json(['message' => 'خطایی رخ داده است!'], 500);
+            return response(['message' => 'خطایی رخ داده است!'], 500);
         }
     }
+
+    // public function pay(Order $order)
+    // {
+    //     // فقط اجازه پرداخت برای سفارش با وضعیت pending
+    //     if ($order->status !== Order::TYPE_PENDING) {
+    //         return response(['message' => 'امکان پرداخت این سفارش وجود ندارد!'], 403);
+    //     }
+
+    //     // ایجاد یک Invoice جدید
+    //     $invoice = (new Invoice)->amount($order->total_price);
+
+    //     // ارسال Invoice به درگاه پرداخت
+    //     return Payment::callbackUrl(route('payment.callback'))->purchase(
+    //         $invoice,
+    //         function($driver, $transactionId) use ($order) {
+    //             // ذخیره transactionId در سفارش
+    //             $order->update(['transaction_id' => $transactionId]);
+    //         }
+    //     )->pay()->render();
+    // }
+
+    // public function callback(Request $request)
+    // {
+    //     // دریافت transactionId از درخواست
+    //     $transactionId = $request->Authority;
+
+    //     // یافتن سفارش بر اساس transactionId
+    //     $order = Order::where('transaction_id', $transactionId)->first();
+
+    //     if (!$order) {
+    //         return response(['message' => 'سفارش یافت نشد!'], 404);
+    //     }
+
+    //     // تایید پرداخت
+    //     $receipt = Payment::amount($order->total_price)->transactionId($transactionId)->verify();
+
+    //     // تغییر وضعیت سفارش به paid
+    //     $order->update(['status' => Order::TYPE_PAID]);
+
+    //     // حذف سبد خرید پس از پرداخت موفق
+    //     $cart = Cart::where('user_id', $order->user_id)->first();
+    //     if ($cart) {
+    //         $cart->cartItems()->delete();
+    //     }
+
+    //     // ارسال ایمیل به کاربر
+    //     $this->sendOrderConfirmationEmail($order);
+
+    //     return response(['message' => 'پرداخت با موفقیت انجام شد!'], 200);
+    // }
+
+    // private function sendOrderConfirmationEmail(Order $order)
+    // {
+    //     // ارسال ایمیل به کاربر
+    //     // این قسمت بسته به استفاده از کتابخانه‌های ایمیل مختلف ممکن است متفاوت باشد
+    //     Mail::to($order->user->email)->send(new OrderConfirmationMail($order));
+    // }
 }

@@ -303,15 +303,30 @@ Route::group(['prefix' => 'order'], function ($router) {
             'list'
         ])->name('order.list');
 
+        $router->get('/current', [
+            OrderController::class,
+            'current'
+        ])->name('order.current');
+
         $router->post('/', [
             OrderController::class,
-            'create'
-        ])->name('order.create');
+            'createOrUpdate'
+        ])->name('order.createOrUpdate');
 
-        $router->put('/{order}', [
+        // $router->put('/{order}', [
+        //     OrderController::class,
+        //     'update'
+        // ])->name('order.update');
+
+        $router->post('/{order}/pay', [
             OrderController::class,
-            'update'
-        ])->name('order.update');
+            'pay'
+        ])->name('order.pay');
+
+        $router->get('/payment/callback', [
+            OrderController::class,
+            'callback'
+        ])->name('order.callback');
 
         $router->delete('/{order}', [
             OrderController::class,

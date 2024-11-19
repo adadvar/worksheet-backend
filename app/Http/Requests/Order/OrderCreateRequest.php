@@ -29,9 +29,9 @@ class OrderCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:users,id',
-            'total_price' => 'nullable|numeric',
-            'status' => ['required' ,new In(Order::TYPES)],
+            // 'user_id' => 'required|exists:users,id',
+            // 'total_price' => 'nullable|numeric',
+            // 'status' => ['required' ,new In(Order::TYPES)],
         ];
     }
 }
