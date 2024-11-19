@@ -18,14 +18,14 @@ class CartController extends Controller
     {
         $user = $r->user();
         $cart = $user->cart ?? $user->cart()->create();
-
+        $cart->load('cartItems.worksheet.grade', 'cartItems.worksheet.subject', 'cartItems.worksheet.topic');
         $cart->cartItems->map(function ($cartItem) {
             $worksheet = $cartItem->worksheet;
             $cartItem->price = $worksheet->price;
             $cartItem->save();
         });
 
-        $cart->load('cartItems');
+        $cart->load('cartItems.worksheet.grade', 'cartItems.worksheet.subject', 'cartItems.worksheet.topic');
         return response($cart);
     }
 
