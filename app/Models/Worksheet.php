@@ -110,6 +110,14 @@ class Worksheet extends Model
     public function isPaid()
     {
         $user = auth('api')->user();
+
+        if (empty($user)) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
         if ($user) {
             $orderItem = OrderItem::where('worksheet_id', $this->id)
                 ->whereHas('order', function ($query) use ($user) {

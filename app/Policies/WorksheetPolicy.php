@@ -2,6 +2,8 @@
 
 namespace App\Policies;
 
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\Worksheet;
 use App\Models\WorksheetFavourite;
@@ -75,6 +77,29 @@ class WorksheetPolicy
         }
 
         return WorksheetFavourite::where($conditions)->count();
+    }
+
+    public function download(User $user, Worksheet $worksheet)
+    {
+        // if (!$user) {
+        //     return false;
+        // }
+
+        if ($user->isAdmin()) {
+            return true;
+        }
+
+        if ($user) {
+            $orderItem = OrderItem::where('worksheet_id', $worksheet->id)
+                ->whereHas('order', function ($query) use ($user) {
+                    $query->where('user_id', $user->id)
+                        ->where('status', Order::TYPE_PAID);
+                })
+                ->first();
+
+            return $orderItem !== null;
+        }
+        return false;
     }
 
     // public function deleteFavourite(User $user = null, Worksheet $worksheet = null)

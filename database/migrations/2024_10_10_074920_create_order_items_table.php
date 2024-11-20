@@ -25,6 +25,12 @@ return new class extends Migration
                 ->on('orders')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+
+            $table->foreign('worksheet_id')
+                ->references('id')
+                ->on('worksheets')
+                ->onDelete('cascade')
+                ->onUpdate('cascade');
         });
     }
 

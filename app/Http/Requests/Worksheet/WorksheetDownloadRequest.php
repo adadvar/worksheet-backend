@@ -5,7 +5,7 @@ namespace App\Http\Requests\Worksheet;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class WorksheetUnlikeRequest extends FormRequest
+class WorksheetDownloadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +15,7 @@ class WorksheetUnlikeRequest extends FormRequest
     public function authorize()
     {
         return Gate::forUser(auth('api')->user())
-            ->allows('unlike', $this->worksheet);
+            ->allows('download', $this->worksheet);
     }
 
     /**

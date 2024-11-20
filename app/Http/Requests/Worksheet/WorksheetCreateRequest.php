@@ -37,7 +37,8 @@ class   WorksheetCreateRequest extends FormRequest
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|gt:0',
             'banner' => ['nullable', new UploadedBannerWorksheetId()],
-            'file' => ['nullable', new UploadedFileWorksheetId()],
+            'file_word' => ['nullable', new UploadedFileWorksheetId()],
+            'file_pdf' => ['nullable', new UploadedFileWorksheetId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
         ];
     }

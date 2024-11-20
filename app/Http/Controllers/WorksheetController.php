@@ -8,13 +8,13 @@ use App\Http\Requests\Worksheet\UploadWorksheetFileRequest;
 use Illuminate\Support\Str;
 use App\Http\Requests\Worksheet\WorksheetCreateRequest;
 use App\Http\Requests\Worksheet\WorksheetDeleteRequest;
+use App\Http\Requests\Worksheet\WorksheetDownloadRequest;
 use App\Http\Requests\Worksheet\WorksheetLikeRequest;
 use App\Http\Requests\Worksheet\WorksheetUnlikeRequest;
 use App\Http\Requests\Worksheet\WorksheetUpdateRequest;
 use App\Models\Category;
 use App\Models\Worksheet;
 use App\Models\WorksheetFavourite;
-use Dompdf\Dompdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\Settings;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class WorksheetController extends Controller
 {
@@ -198,7 +200,6 @@ class WorksheetController extends Controller
 
             if ($r->has('banner') && !empty($r->banner)) {
                 $bannerName = $r->banner;
-                // Storage::move('worksheets/tmp/' . $bannerName, 'worksheets/' . $bannerName);
                 Storage::disk('banners')->move('tmp/' . $bannerName, $bannerName);
 
                 $worksheet->banner = $bannerName;
@@ -206,18 +207,23 @@ class WorksheetController extends Controller
                 DB::table('temporary_files')->where('file_name', $bannerName)->delete();
             }
 
-            if ($r->has('file') && !empty($r->file)) {
-                $fileName = $r->file;
+            if ($r->has('file_word') && !empty($r->file_word)) {
+                $fileName = $r->file_word;
                 $docxPath = 'tmp/' . $fileName;
-                $pdfPath = str_replace('.docx', '.pdf', $fileName);
 
-                // $this->convertDocxToPdf($docxPath, $pdfPath);
-
-                // Storage::move('worksheets/tmp/' . $fileName, 'worksheets/' . $fileName);
                 Storage::disk('worksheets')->move($docxPath, $fileName);
-                // Storage::disk('worksheets')->move('tmp/' . $pdfPath, $pdfPath);
 
                 $worksheet->file_word = $fileName;
+
+                DB::table('temporary_files')->where('file_name', $fileName)->delete();
+            }
+
+            if ($r->has('file_pdf') && !empty($r->file_pdf)) {
+                $fileName = $r->file_pdf;
+                $docxPath = 'tmp/' . $fileName;
+
+                Storage::disk('worksheets')->move($docxPath, $fileName);
+
                 $worksheet->file_pdf = $fileName;
 
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
@@ -246,35 +252,29 @@ class WorksheetController extends Controller
 
             if ($r->has('banner') && !empty($r->banner)) {
                 if ($worksheet->banner) {
-                    // Storage::delete('worksheets/' . $worksheet->banner);
                     Storage::disk('banners')->delete($worksheet->banner);
                 }
-                // Storage::move('worksheets/tmp/' . $data['banner'], 'worksheets/' . $data['banner']);
-                Storage::disk('banners')->move('tmp/' . $data['banner'], $data['banner']);
+                Storage::disk('banners')->move('tmp/' . $r->banner, $r->banner);
+                $worksheet->banner = $r->banner;
+                DB::table('temporary_files')->where('file_name', $r->banner)->delete();
             }
 
-            if ($r->has('file') && !empty($r->file)) {
+            if ($r->has('file_word') && !empty($r->file_word)) {
                 if ($worksheet->file_word) {
-                    // Storage::delete('worksheets/' . $worksheet->file);
                     Storage::disk('worksheets')->delete($worksheet->file_word);
+                }
+                Storage::disk('worksheets')->move('tmp/' . $r->file_word, $r->file_word);
+                $worksheet->file_word = $r->file_word;
+                DB::table('temporary_files')->where('file_name', $r->file_word)->delete();
+            }
+
+            if ($r->has('file_pdf') && !empty($r->file_pdf)) {
+                if ($worksheet->file_pdf) {
                     Storage::disk('worksheets')->delete($worksheet->file_pdf);
                 }
-                // Storage::move('worksheets/tmp/' . $data['file'], 'worksheets/' . $data['file']);
-                $fileName = $r->file;
-                $docxPath = 'tmp/' . $fileName;
-                $pdfPath = str_replace('.docx', '.pdf', $fileName);
-
-                // Convert DOCX to PDF
-                // $this->convertDocxToPdf($docxPath, $pdfPath);
-
-                // Move DOCX file
-                Storage::disk('worksheets')->move($docxPath, $fileName);
-                // Storage::disk('worksheets')->move('tmp/' . $pdfPath, $pdfPath);
-
-                $worksheet->file_word = $fileName;
-                $worksheet->pdf_file = $pdfPath;
-
-                DB::table('temporary_files')->where('file_name', $fileName)->delete();
+                Storage::disk('worksheets')->move('tmp/' . $r->file_pdf, $r->file_pdf);
+                $worksheet->file_pdf = $r->file_pdf;
+                DB::table('temporary_files')->where('file_name', $r->file_pdf)->delete();
             }
 
             if (!$r->slug) {
@@ -286,7 +286,6 @@ class WorksheetController extends Controller
             DB::commit();
 
             return response(['message' => 'کاربرگ بروزرسانی شد'], 201);
-            // return response($worksheet, 200);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error($e->getTraceAsString());
@@ -362,21 +361,17 @@ class WorksheetController extends Controller
         return response($user->recentWorksheets);
     }
 
-    public function downloadPdf(Worksheet $worksheet)
+    public function downloadPdf(WorksheetDownloadRequest $r)
     {
-        if (!$worksheet->isPaid()) {
-            return response()->json(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
+        $worksheet = $r->worksheet;
 
         $filePath = Storage::disk('worksheets')->path($worksheet->file_pdf);
         return response()->download($filePath);
     }
 
-    public function downloadWord(Worksheet $worksheet)
+    public function downloadWord(WorksheetDownloadRequest $r)
     {
-        if (!$worksheet->isPaid()) {
-            return response()->json(['message' => 'دسترسی غیرمجاز!'], 403);
-        }
+        $worksheet = $r->worksheet;
 
         $filePath = Storage::disk('worksheets')->path($worksheet->file_word);
         return response()->download($filePath);
@@ -385,8 +380,19 @@ class WorksheetController extends Controller
 
     private function convertDocxToPdf($docxPath, $pdfPath)
     {
-        // Convert DOCX to PDF
+        // $domPdfPath = base_path('vendor/dompdf/dompdf');
+        // Settings::setPdfRendererPath($domPdfPath);
+        // Settings::setPdfRendererName('DomPDF');
+        // $phpWord = IOFactory::load(Storage::disk('worksheets')->path($docxPath));
+        // dd(Storage::disk('worksheets')->path($docxPath));
+        // $pdfWriter = IOFactory::createWriter($phpWord, "PDF");
+
+        // $pdfWriter->save(Storage::disk('worksheets')->path($pdfPath));
+
+        // Load the DOCX file
         $phpWord = IOFactory::load(Storage::disk('worksheets')->path($docxPath));
+
+        // Convert the DOCX to HTML
         $htmlContent = '';
         foreach ($phpWord->getSections() as $section) {
             foreach ($section->getElements() as $element) {
@@ -406,11 +412,12 @@ class WorksheetController extends Controller
             }
         }
 
-        $dompdf = new Dompdf();
-        $dompdf->loadHtml($htmlContent);
-        $dompdf->setPaper('A4', 'portrait');
-        $dompdf->render();
+        // Convert HTML to PDF using Dompdf
+        $pdf = PDF::loadHTML($htmlContent);
+        $pdf->setPaper('A4', 'portrait');
+        $pdf->render();
 
-        Storage::disk('worksheets')->put($pdfPath, $dompdf->output());
+        // Save the PDF to the specified path
+        Storage::disk('worksheets')->put($pdfPath, $pdf->output());
     }
 }
