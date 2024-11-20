@@ -209,9 +209,9 @@ class WorksheetController extends Controller
 
             if ($r->has('file_word') && !empty($r->file_word)) {
                 $fileName = $r->file_word;
-                $docxPath = 'tmp/' . $fileName;
+                $path = 'tmp/' . $fileName;
 
-                Storage::disk('worksheets')->move($docxPath, $fileName);
+                Storage::disk('worksheets')->move($path, $fileName);
 
                 $worksheet->file_word = $fileName;
 
@@ -220,9 +220,9 @@ class WorksheetController extends Controller
 
             if ($r->has('file_pdf') && !empty($r->file_pdf)) {
                 $fileName = $r->file_pdf;
-                $docxPath = 'tmp/' . $fileName;
+                $path = 'tmp/' . $fileName;
 
-                Storage::disk('worksheets')->move($docxPath, $fileName);
+                Storage::disk('worksheets')->move($path, $fileName);
 
                 $worksheet->file_pdf = $fileName;
 
@@ -260,21 +260,25 @@ class WorksheetController extends Controller
             }
 
             if ($r->has('file_word') && !empty($r->file_word)) {
+                $fileName = $r->file_word;
+                $path = 'tmp/' . $fileName;
                 if ($worksheet->file_word) {
                     Storage::disk('worksheets')->delete($worksheet->file_word);
                 }
-                Storage::disk('worksheets')->move('tmp/' . $r->file_word, $r->file_word);
-                $worksheet->file_word = $r->file_word;
-                DB::table('temporary_files')->where('file_name', $r->file_word)->delete();
+                Storage::disk('worksheets')->move($path, $fileName);
+                $worksheet->file_word = $fileName;
+                DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
             if ($r->has('file_pdf') && !empty($r->file_pdf)) {
+                $fileName = $r->file_pdf;
+                $path = 'tmp/' . $fileName;
                 if ($worksheet->file_pdf) {
                     Storage::disk('worksheets')->delete($worksheet->file_pdf);
                 }
-                Storage::disk('worksheets')->move('tmp/' . $r->file_pdf, $r->file_pdf);
-                $worksheet->file_pdf = $r->file_pdf;
-                DB::table('temporary_files')->where('file_name', $r->file_pdf)->delete();
+                Storage::disk('worksheets')->move($path, $fileName);
+                $worksheet->file_pdf = $fileName;
+                DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
             if (!$r->slug) {
