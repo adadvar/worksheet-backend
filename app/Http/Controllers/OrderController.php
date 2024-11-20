@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Order\OrderCreateRequest;
 use App\Http\Requests\Order\OrderDeleteRequest;
 use App\Http\Requests\Order\OrderListRequest;
+use App\Http\Requests\Order\OrderMyRequest;
 use App\Http\Requests\Order\OrderShowRequest;
 use App\Http\Requests\Order\OrderUpdateRequest;
 use App\Models\Cart;
@@ -19,13 +20,13 @@ class OrderController extends Controller
 {
     public function list(OrderListRequest $r)
     {
-        $orders = Order::with('orderItems')->get();
+        $orders = Order::get();
         return response($orders);
     }
 
-    public function current(Request $request)
+    public function current(Request $r)
     {
-        $user = $request->user();
+        $user = $r->user();
         $order = $user->orders()->where('status', Order::TYPE_PENDING)->first();
 
         if (!$order) {
@@ -35,12 +36,20 @@ class OrderController extends Controller
         return response($order);
     }
 
-    public function createOrUpdate(OrderCreateRequest $request)
+    public function my(Request $r)
+    {
+        $user = $r->user();
+        $order = $user->orders()->whereNot('status', Order::TYPE_PENDING)->with('orderItems.worksheet.grade', 'orderItems.worksheet.subject', 'orderItems.worksheet.topic')->get();
+
+        return response($order);
+    }
+
+    public function createOrUpdate(OrderCreateRequest $r)
     {
         try {
             DB::beginTransaction();
 
-            $user = $request->user();
+            $user = $r->user();
             $cart = $user->cart;
 
             if (!$cart || $cart->cartItems->isEmpty()) {
@@ -138,10 +147,10 @@ class OrderController extends Controller
     //     )->pay()->render();
     // }
 
-    // public function callback(Request $request)
+    // public function callback(Request $r)
     // {
     //     // دریافت transactionId از درخواست
-    //     $transactionId = $request->Authority;
+    //     $transactionId = $r->Authority;
 
     //     // یافتن سفارش بر اساس transactionId
     //     $order = Order::where('transaction_id', $transactionId)->first();

@@ -319,6 +319,11 @@ Route::group(['prefix' => 'order'], function ($router) {
             'current'
         ])->name('order.current');
 
+        $router->get('/my', [
+            OrderController::class,
+            'my'
+        ])->name('order.my');
+
         $router->post('/', [
             OrderController::class,
             'createOrUpdate'

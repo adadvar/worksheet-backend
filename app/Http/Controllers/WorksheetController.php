@@ -370,7 +370,9 @@ class WorksheetController extends Controller
         $worksheet = $r->worksheet;
 
         $filePath = Storage::disk('worksheets')->path($worksheet->file_pdf);
-        return response()->download($filePath);
+        $fileName = $worksheet->name . '.pdf';
+
+        return response()->download($filePath, $fileName);
     }
 
     public function downloadWord(WorksheetDownloadRequest $r)
@@ -378,7 +380,9 @@ class WorksheetController extends Controller
         $worksheet = $r->worksheet;
 
         $filePath = Storage::disk('worksheets')->path($worksheet->file_word);
-        return response()->download($filePath);
+        $fileName = $worksheet->name . '.docx';
+        return response()->download($filePath, $fileName);
+        // return Storage::disk('worksheet')->download($worksheet->file_word);
     }
 
 

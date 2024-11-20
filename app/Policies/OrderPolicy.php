@@ -40,7 +40,6 @@ class OrderPolicy
         return $user->isAdmin() || ($order && $user->id == $order->user_id);
     }
 
-
     public function changeState(User $user, Order $order)
     {
         return $user->isAdmin();

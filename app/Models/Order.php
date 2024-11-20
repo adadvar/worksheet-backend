@@ -10,7 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $table = 'orders';
-    protected $fillable = ['user_id', 'total_price', 'status'];
+    protected $fillable = ['order_number', 'user_id', 'total_price', 'status', 'transaction_id'];
 
     const TYPE_PENDING = 'pending';
     //TODO: add event paid and send email
@@ -21,9 +21,9 @@ class Order extends Model
 
     protected $with = ['orderItems'];
 
-    public function worksheets()
+    public function getRouteKeyName()
     {
-        return $this->hasMany(Worksheet::class)->withTrashed();
+        return 'order_number';
     }
 
     public function user()
@@ -34,5 +34,15 @@ class Order extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            $lastOrder = Order::orderBy('order_number', 'desc')->first();
+            $order->order_number = $lastOrder ? $lastOrder->order_number + 1 : 100000000;
+        });
     }
 }
