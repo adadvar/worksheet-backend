@@ -327,9 +327,18 @@ class WorksheetController extends Controller
 
     public static function like(WorksheetLikeRequest $r)
     {
+        $userId =  $r->user()->id;
+        $currentLikesCount = WorksheetFavourite::where('user_id', $userId)->count();
+        if ($currentLikesCount >= 30) {
+            WorksheetFavourite::where('user_id', $userId)
+                ->orderBy('created_at', 'asc')
+                ->limit(1)
+                ->delete();
+        }
         //ابتدا باید وضعیت worksheet به accepted تغییر کند
         WorksheetFavourite::create([
-            'user_id' => Auth::guard('api')->id(),
+            // 'user_id' => Auth::guard('api')->id(),
+            'user_id' => $userId,
             'user_ip' => client_ip(),
             'worksheet_id' => $r->worksheet->id,
         ]);
