@@ -98,7 +98,7 @@ class OrderController extends Controller
      */
     public function show(OrderShowRequest $r)
     {
-        $order = $r->order;
+        $order = $r->order->whereNot('status', Order::TYPE_PENDING)->with('orderItems.worksheet.grade', 'orderItems.worksheet.subject', 'orderItems.worksheet.topic')->first();
         return response($order);
     }
 

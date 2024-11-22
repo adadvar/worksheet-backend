@@ -372,7 +372,10 @@ class WorksheetController extends Controller
         $filePath = Storage::disk('worksheets')->path($worksheet->file_pdf);
         $fileName = $worksheet->name . '.pdf';
 
-        return response()->download($filePath, $fileName);
+        if (!Storage::disk('worksheets')->exists($worksheet->file_pdf))
+            return response()->json(['message' => 'فایل یافت نشد'], 404);
+
+        return response()->download($filePath, $fileName,);
     }
 
     public function downloadWord(WorksheetDownloadRequest $r)
@@ -381,8 +384,11 @@ class WorksheetController extends Controller
 
         $filePath = Storage::disk('worksheets')->path($worksheet->file_word);
         $fileName = $worksheet->name . '.docx';
+
+        if (!Storage::disk('worksheets')->exists($worksheet->file_pdf))
+            return response()->json(['message' => 'فایل یافت نشد'], 404);
+
         return response()->download($filePath, $fileName);
-        // return Storage::disk('worksheet')->download($worksheet->file_word);
     }
 
 

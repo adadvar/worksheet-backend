@@ -95,14 +95,14 @@ class Worksheet extends Model
 
     public function getFilePdfLinkAttribute()
     {
-        if ($this->isPaid())
+        if ($this->isPaid() && $this->file_pdf && Storage::disk('worksheets')->exists($this->file_pdf))
             return Storage::disk('worksheets')->url($this->file_pdf);
         return null;
     }
 
     public function getFileWordLinkAttribute()
     {
-        if ($this->isPaid())
+        if ($this->isPaid() && $this->file_word && Storage::disk('worksheets')->exists($this->file_word))
             return Storage::disk('worksheets')->url($this->file_word);
         return null;
     }
