@@ -243,7 +243,7 @@ Route::group(['prefix' => 'worksheet'], function ($router) {
             'unlike'
         ])->name('worksheet.unlike');
 
-        $router->get('/favourites', [
+        $router->get('/favourites/{param1?}/{param2?}/{param3?}', [
             WorksheetController::class,
             'favourites'
         ])->name('worksheet.favourites');

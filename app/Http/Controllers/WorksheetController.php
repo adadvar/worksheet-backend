@@ -356,7 +356,83 @@ class WorksheetController extends Controller
     public static function favourites(Request $r)
     {
         $user = auth()->user();
-        return response($user->favouriteWorksheets);
+
+        $whereIns = [];
+        $conditions = [];
+        $categoryRequests = null;
+
+        // فیلتر کردن بر اساس دسته‌بندی
+        if ($r->param1) {
+            $categoryRequests = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
+        }
+
+        if ($r->param2) {
+            $categoryRequests = Category::where('slug', $r->param2)
+                ->where(function ($query) use ($r) {
+                    $query->whereHas('parent', function ($query) use ($r) {
+                        $query->where('slug', $r->param1);
+                    })->orWhereHas('parent.parent', function ($query) use ($r) {
+                        $query->where('slug', $r->param1);
+                    });
+                })->get();
+        }
+
+        if ($r->param3) {
+            $categoryRequests = Category::where(['type' => 'topic', 'slug' => $r->param3])
+                ->whereHas('parent', function ($query) use ($r) {
+                    $query->where('slug', $r->param2);
+                })
+                ->whereHas('parent.parent', function ($query) use ($r) {
+                    $query->where('slug', $r->param1);
+                })->get();
+        }
+
+        if ($categoryRequests) {
+            $ids = [];
+            foreach ($categoryRequests as $categoryRequest) {
+                $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
+            }
+            $ids = array_unique($ids);
+
+            $whereIns['grade_id'] = $ids;
+            $whereIns['subject_id'] = $ids;
+            $whereIns['topic_id'] = $ids;
+        }
+
+        $query = $user->favouriteWorksheets();
+
+        $query->where(function ($query) use ($whereIns) {
+            foreach ($whereIns as $column => $values) {
+                $query->orWhereIn($column, $values);
+            }
+        });
+
+        $query->with(['grade', 'subject', 'topic']);
+        $query->withCount('viewers as views_count');
+
+        switch ($r->sortBy) {
+            case 'view-desc':
+                $query->orderBy('views_count', 'desc');
+                break;
+            case 'order-desc':
+                $query->orderBy('id', 'desc');
+                break;
+            case 'price-asc':
+                $query->orderBy('price', 'asc');
+                break;
+            case 'price-desc':
+                $query->orderBy('price', 'desc');
+                break;
+            case 'date-desc':
+            default:
+                $query->orderBy('updated_at', 'desc');
+                break;
+        }
+
+        $perPage = $r->per_page ?? 10;
+        $favouriteWorksheets = $query->paginate($perPage);
+
+        return response($favouriteWorksheets);
     }
 
     public static function recents(Request $r)
