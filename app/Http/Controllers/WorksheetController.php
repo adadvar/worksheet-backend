@@ -76,6 +76,23 @@ class WorksheetController extends Controller
 
         $query = Worksheet::query();
 
+        if ($r->search) {
+            $searchTerm = $r->search;
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('name', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('description', 'like', '%' . $searchTerm . '%')
+                    ->orWhereHas('grade', function ($query) use ($searchTerm) {
+                        $query->where('name', 'like', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('subject', function ($query) use ($searchTerm) {
+                        $query->where('name', 'like', '%' . $searchTerm . '%');
+                    })
+                    ->orWhereHas('topic', function ($query) use ($searchTerm) {
+                        $query->where('name', 'like', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
         $query->where($conditions);
         foreach ($whereIns as $column => $values) {
             $query->orWhereIn($column, $values);
