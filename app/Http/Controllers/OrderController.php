@@ -33,6 +33,22 @@ class OrderController extends Controller
             return response(['message' => 'سفارش فعلی یافت نشد!'], 404);
         }
 
+        $cart = $user->cart;
+        if ($cart && $cart->cartItems->isNotEmpty()) {
+            $cartItems = $cart->cartItems->keyBy('worksheet_id');
+
+            foreach ($order->orderItems as $orderItem) {
+                if (isset($cartItems[$orderItem->worksheet_id])) {
+                    $orderItem->price = $cartItems[$orderItem->worksheet_id]->price;
+                    $orderItem->save();
+                }
+            }
+        }
+
+        $totalPrice = $order->orderItems->sum('price');
+        $order->total_price = $totalPrice;
+        $order->save();
+
         return response($order);
     }
 
