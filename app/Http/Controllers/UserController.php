@@ -163,7 +163,7 @@ class UserController extends Controller
     if ($request->q) {
       $query->where('name', 'LIKE', '%' . $request->q . '%');
     }
-    return $query->paginate($request->per_page ?? 10);
+    return $query->paginate($request->per_page ?? 9);
   }
 
   public function update(UserUpdateRequest $request)

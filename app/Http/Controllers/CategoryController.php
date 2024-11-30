@@ -22,7 +22,7 @@ class CategoryController extends Controller
         }
         $query->where('parent_id', null)->with('child')->get();
         if ($r->page)
-            return $query->paginate($r->per_page ?? 10);
+            return $query->paginate($r->per_page ?? 9);
         return $query->get();
     }
 

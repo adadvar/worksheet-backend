@@ -111,7 +111,7 @@ class WorksheetController extends Controller
         // if ($r->o == 'pa') $query->orderBy('price', 'asc');
         // if ($r->o == 'pd') $query->orderBy('price', 'desc');
 
-        $perPage = $r->per_page ?? 10;
+        $perPage = $r->per_page ?? 9;
         $worksheets = $query->paginate($perPage);
 
         return response($worksheets);
@@ -455,7 +455,7 @@ class WorksheetController extends Controller
                 break;
         }
 
-        $perPage = $r->per_page ?? 10;
+        $perPage = $r->per_page ?? 9;
         $favouriteWorksheets = $query->paginate($perPage);
 
         return response($favouriteWorksheets);
