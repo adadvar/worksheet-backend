@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UploadWorksheetFileRequest extends FormRequest
+class ProductListRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,6 @@ class UploadWorksheetFileRequest extends FormRequest
      */
     public function authorize()
     {
-        //TODO: must administrator be able
         return true;
     }
 
@@ -24,8 +23,6 @@ class UploadWorksheetFileRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'file' => 'required|mimes:doc,docx,pdf|max:10240',
-        ];
+        return [];
     }
 }

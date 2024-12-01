@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use App\Events\VisitWorksheet;
-use App\Listeners\AddVisitedWorksheetLogToWorksheetRecentsTable;
-use App\Listeners\AddVisitedWorksheetLogToWorksheetViewsTable;
+use App\Events\VisitProduct;
+use App\Listeners\AddVisitedProductLogToProductRecentsTable;
+use App\Listeners\AddVisitedProductLogToProductViewsTable;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -21,9 +21,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        VisitWorksheet::class => [
-            AddVisitedWorksheetLogToWorksheetViewsTable::class,
-            AddVisitedWorksheetLogToWorksheetRecentsTable::class,
+        VisitProduct::class => [
+            AddVisitedProductLogToProductViewsTable::class,
+            AddVisitedProductLogToProductRecentsTable::class,
         ],
     ];
 

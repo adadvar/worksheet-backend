@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UploadWorksheetBannersRequest extends FormRequest
+class ProductShowRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +13,6 @@ class UploadWorksheetBannersRequest extends FormRequest
      */
     public function authorize()
     {
-        //TODO: must administrator be able
         return true;
     }
 
@@ -24,8 +23,6 @@ class UploadWorksheetBannersRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'banner' => 'required|image|max:1024',
-        ];
+        return [];
     }
 }

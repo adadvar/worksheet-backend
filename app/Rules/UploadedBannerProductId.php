@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Support\Facades\Storage;
 
-class UploadedFileWorksheetId implements ValidationRule
+class UploadedBannerProductId implements ValidationRule
 {
     /**
      * Run the validation rule.
@@ -15,8 +15,8 @@ class UploadedFileWorksheetId implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        // $isFileExist =  Storage::exists('worksheets/tmp/' . $value);
-        $isFileExist = Storage::disk('worksheets')->exists('tmp/' . $value);
+        // $isFileExist =  Storage::exists('products/tmp/' . $value);
+        $isFileExist = Storage::disk('banners')->exists('tmp/' . $value);
 
         if (!$isFileExist) {
             $fail('فایل با نام :attribute وجود ندارد.');

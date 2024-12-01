@@ -23,9 +23,9 @@ class Category extends Model
     }
 
 
-    public function worksheets()
+    public function products()
     {
-        return $this->hasMany(Worksheet::class);
+        return $this->hasMany(Product::class);
     }
 
     public function parent()

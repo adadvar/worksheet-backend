@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class WorksheetUnlikeRequest extends FormRequest
+class UploadProductBannersRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,8 +13,8 @@ class WorksheetUnlikeRequest extends FormRequest
      */
     public function authorize()
     {
-        return Gate::forUser(auth('api')->user())
-            ->allows('unlike', $this->worksheet);
+        //TODO: must administrator be able
+        return true;
     }
 
     /**
@@ -25,6 +24,8 @@ class WorksheetUnlikeRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'banner' => 'required|image|max:1024',
+        ];
     }
 }

@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
-use App\Events\VisitWorksheet;
-use App\Models\WorksheetRecent;
+use App\Events\VisitProduct;
+use App\Models\ProductRecent;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class AddVisitedWorksheetLogToWorksheetRecentsTable
+class AddVisitedProductLogToProductRecentsTable
 {
     /**
      * Create the event listener.
@@ -23,24 +23,24 @@ class AddVisitedWorksheetLogToWorksheetRecentsTable
     /**
      * Handle the event.
      */
-    public function handle(VisitWorksheet $event): void
+    public function handle(VisitProduct $event): void
     {
         if (auth('api')->check()) {
             try {
-                $worksheet = $event->getWorksheet();
+                $product = $event->getProduct();
                 $userId = auth('api')->user()->id;
                 $conditions = [
                     'user_id' => $userId,
-                    'worksheet_id' => $worksheet->id,
+                    'product_id' => $product->id,
                 ];
-                if (!WorksheetRecent::where($conditions)->count()) {
-                    $worksheetRecent = WorksheetRecent::where(['user_id' => $userId]);
-                    if ($worksheetRecent->count() > 30) {
-                        $worksheetRecent->first()->delete();
+                if (!ProductRecent::where($conditions)->count()) {
+                    $productRecent = ProductRecent::where(['user_id' => $userId]);
+                    if ($productRecent->count() > 30) {
+                        $productRecent->first()->delete();
                     }
-                    WorksheetRecent::create([
+                    ProductRecent::create([
                         'user_id' => $userId,
-                        'worksheet_id' => $worksheet->id,
+                        'product_id' => $product->id,
                     ]);
                 }
             } catch (Exception $exception) {

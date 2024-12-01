@@ -26,7 +26,7 @@ class CartCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'worksheet_id' => 'required|exists:worksheets,id',
+            'product_id' => 'required|exists:products,id',
             'price' => 'nullable|numeric',
         ];
     }

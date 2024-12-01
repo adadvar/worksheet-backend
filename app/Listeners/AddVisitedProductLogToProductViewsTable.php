@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
-use App\Events\VisitWorksheet;
-use App\Models\WorksheetView;
+use App\Events\VisitProduct;
+use App\Models\ProductView;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class AddVisitedWorksheetLogToWorksheetViewsTable
+class AddVisitedProductLogToProductViewsTable
 {
     /**
      * Create the event listener.
@@ -23,13 +23,13 @@ class AddVisitedWorksheetLogToWorksheetViewsTable
     /**
      * Handle the event.
      */
-    public function handle(VisitWorksheet $event): void
+    public function handle(VisitProduct $event): void
     {
         try {
-            $worksheet = $event->getWorksheet();
+            $product = $event->getProduct();
             $conditions = [
                 'user_id' => auth('api')->id(),
-                'worksheet_id' => $worksheet->id,
+                'product_id' => $product->id,
                 ['created_at', '>', now()->subDays(1)]
             ];
             $clientIp = client_ip();
@@ -38,10 +38,10 @@ class AddVisitedWorksheetLogToWorksheetViewsTable
                 $conditions['user_ip'] = $clientIp;
             }
 
-            if (!WorksheetView::where($conditions)->count()) {
-                WorksheetView::create([
+            if (!ProductView::where($conditions)->count()) {
+                ProductView::create([
                     'user_id' => auth('api')->id(),
-                    'worksheet_id' => $worksheet->id,
+                    'product_id' => $product->id,
                     'user_ip' => $clientIp
                 ]);
             }

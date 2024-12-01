@@ -126,34 +126,34 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class);
     }
 
-    public function favouriteWorksheets()
+    public function favouriteProducts()
     {
         return $this->hasManyThrough(
-            Worksheet::class,
-            WorksheetFavourite::class,
-            'user_id', //worksheet_favorites.user_id
-            'id', //worksheet.id
+            Product::class,
+            ProductFavourite::class,
+            'user_id', //product_favorites.user_id
+            'id', //product.id
             'id', //user.id
-            'worksheet_id', //worksheet_favorites.worksheet_id
+            'product_id', //product_favorites.product_id
         );
     }
 
-    public function recentWorksheets()
+    public function recentProducts()
     {
         return $this->hasManyThrough(
-            Worksheet::class,
-            WorksheetRecent::class,
-            'user_id', //worksheet_favorites.user_id
-            'id', //worksheet.id
+            Product::class,
+            ProductRecent::class,
+            'user_id', //product_favorites.user_id
+            'id', //product.id
             'id', //user.id
-            'worksheet_id', //worksheet_favorites.worksheet_id
+            'product_id', //product_favorites.product_id
         );
     }
 
     public function views()
     {
         return $this
-            ->belongsToMany(Worksheet::class, 'worksheet_views')
+            ->belongsToMany(Product::class, 'product_views')
             ->withTimestamps();
     }
 }

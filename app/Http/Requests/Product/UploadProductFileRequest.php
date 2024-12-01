@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
-use App\Models\Worksheet;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Gate;
 
-class WorksheetLikeRequest extends FormRequest
+class UploadProductFileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,8 +13,8 @@ class WorksheetLikeRequest extends FormRequest
      */
     public function authorize()
     {
-        return Gate::forUser(auth('api')->user())
-            ->allows('like', $this->worksheet);
+        //TODO: must administrator be able
+        return true;
     }
 
     /**
@@ -26,6 +24,9 @@ class WorksheetLikeRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return [
+            'file' => 'required|max:10240',
+            // 'file' => 'required|mimes:application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document|max:10240',
+        ];
     }
 }

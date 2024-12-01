@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
         $this->call(CitiesTableSeeder::class);
         $this->call(CategoriesTableSeeder::class);
-        $this->call(WorksheetsTableSeeder::class);
+        $this->call(ProductsTableSeeder::class);
         Schema::enableForeignKeyConstraints();
 
         // \App\Models\User::factory(10)->create();

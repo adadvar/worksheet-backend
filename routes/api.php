@@ -5,7 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\WorksheetController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -178,106 +178,106 @@ Route::group(['prefix' => 'category'], function ($router) {
 // });
 
 
-Route::group(['prefix' => 'worksheet'], function ($router) {
+Route::group(['prefix' => 'product'], function ($router) {
 
     $router->get('/list/{param1?}/{param2?}/{param3?}', [
-        WorksheetController::class,
+        ProductController::class,
         'list'
-    ])->name('worksheet.list');
+    ])->name('product.list');
 
-    $router->get('/show/{worksheet}', [
-        WorksheetController::class,
+    $router->get('/show/{product}', [
+        ProductController::class,
         'show'
-    ])->name('worksheet.show');
+    ])->name('product.show');
 
 
     Route::group(['middleware' => ['auth:sanctum']], function ($router) {
 
         $router->get('/admin/{category?}', [
-            WorksheetController::class,
+            ProductController::class,
             'listAdmin'
-        ])->name('worksheet.admin.list');
+        ])->name('product.admin.list');
 
         $router->get('/admin/show/{id_slug}', [
-            WorksheetController::class,
+            ProductController::class,
             'showAdmin'
-        ])->name('worksheet.admin.show');
+        ])->name('product.admin.show');
 
         $router->post('/', [
-            WorksheetController::class,
+            ProductController::class,
             'create'
-        ])->name('worksheet.create');
+        ])->name('product.create');
 
         $router->post('/upload/banner', [
-            WorksheetController::class,
+            ProductController::class,
             'uploadBanner'
-        ])->name('worksheet.upload.banner');
+        ])->name('product.upload.banner');
 
         $router->post('/upload/file', [
-            WorksheetController::class,
+            ProductController::class,
             'uploadFile'
-        ])->name('worksheet.upload.file');
+        ])->name('product.upload.file');
 
-        $router->put('/{worksheet}', [
-            WorksheetController::class,
+        $router->put('/{product}', [
+            ProductController::class,
             'update'
-        ])->name('worksheet.update');
+        ])->name('product.update');
 
-        // $router->put('/{worksheet}/state', [
-        //     WorksheetController::class,
+        // $router->put('/{product}/state', [
+        //     ProductController::class,
         //     'changeState'
-        // ])->name('worksheet.change.state');
+        // ])->name('product.change.state');
 
-        $router->delete('/{worksheet}', [
-            WorksheetController::class,
+        $router->delete('/{product}', [
+            ProductController::class,
             'delete'
-        ])->name('worksheet.delete');
+        ])->name('product.delete');
 
-        $router->match(['get', 'post'], '/{worksheet}/like', [
-            WorksheetController::class,
+        $router->match(['get', 'post'], '/{product}/like', [
+            ProductController::class,
             'like'
-        ])->name('worksheet.like');
+        ])->name('product.like');
 
-        $router->match(['get', 'post'], '/{worksheet}/unlike', [
-            WorksheetController::class,
+        $router->match(['get', 'post'], '/{product}/unlike', [
+            ProductController::class,
             'unlike'
-        ])->name('worksheet.unlike');
+        ])->name('product.unlike');
 
         $router->get('/favourites/{param1?}/{param2?}/{param3?}', [
-            WorksheetController::class,
+            ProductController::class,
             'favourites'
-        ])->name('worksheet.favourites');
+        ])->name('product.favourites');
 
-        // $router->delete('/{worksheet}/delete-favourite', [
-        //     WorksheetController::class,
+        // $router->delete('/{product}/delete-favourite', [
+        //     ProductController::class,
         //     'deleteFavourite'
-        // ])->name('worksheet.deleteFavourite');
+        // ])->name('product.deleteFavourite');
 
         $router->get('/recents', [
-            WorksheetController::class,
+            ProductController::class,
             'recents'
-        ])->name('worksheet.recents');
+        ])->name('product.recents');
 
-        // $router->delete('/{worksheet}/delete-recent', [
-        //     WorksheetController::class,
+        // $router->delete('/{product}/delete-recent', [
+        //     ProductController::class,
         //     'deleteRecent'
-        // ])->name('worksheet.deleteRecent');
+        // ])->name('product.deleteRecent');
 
-        $router->get('/{worksheet}/download-pdf', [
-            WorksheetController::class,
+        $router->get('/{product}/download-pdf', [
+            ProductController::class,
             'downloadPdf'
-        ])->name('worksheet.downloadPdf');
+        ])->name('product.downloadPdf');
 
-        $router->get('/{worksheet}/download-word', [
-            WorksheetController::class,
+        $router->get('/{product}/download-word', [
+            ProductController::class,
             'downloadWord'
-        ])->name('worksheet.downloadWord');
+        ])->name('product.downloadWord');
 
 
         $router->get('/my', [
-            WorksheetController::class,
+            ProductController::class,
             'my'
-        ])->name('worksheet.my');
+        ])->name('product.my');
     });
 });
 
@@ -299,7 +299,7 @@ Route::group(['prefix' => 'cart'], function ($router) {
             'update'
         ])->name('cartitem.update');
 
-        $router->delete('/{worksheet}', [
+        $router->delete('/{product}', [
             CartController::class,
             'delete'
         ])->name('cartitem.delete');

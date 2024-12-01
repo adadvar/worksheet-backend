@@ -34,7 +34,7 @@ class UsersTableSeeder extends Seeder
         $user = User::create([
             'name' => 'مدیر اصلی',
             'password' => Hash::make('111111'),
-            'email' => 'admin@worksheet.com',
+            'email' => 'admin@product.com',
             'mobile' => '+989000000000',
             'verified_at' => now()
         ]);
@@ -50,7 +50,7 @@ class UsersTableSeeder extends Seeder
         $user = User::create([
             'name' => 'کاربر ' . $num,
             'password' => Hash::make('111111'),
-            'email' => 'user' . $num . '@worksheet.com',
+            'email' => 'user' . $num . '@product.com',
             'mobile' => '+989' . str_repeat($num, 9),
             'verified_at' => now()
         ]);

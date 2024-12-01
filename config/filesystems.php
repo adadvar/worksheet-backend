@@ -56,10 +56,10 @@ return [
             'throw' => false,
         ],
 
-        'worksheets' => [
+        'products' => [
             'driver' => 'local',
-            'root' => storage_path('app/worksheets'),
-            'url' => env('APP_URL') . '/storage/worksheets',
+            'root' => storage_path('app/products'),
+            'url' => env('APP_URL') . '/storage/products',
             'visibility' => 'private',
             'throw' => false,
         ],

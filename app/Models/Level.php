@@ -12,8 +12,8 @@ class Level extends Model
     protected $table = 'levels';
     protected $fillable = ['name'];
 
-    public function worksheets()
+    public function products()
     {
-        return $this->hasMany(Worksheet::class);
+        return $this->hasMany(Product::class);
     }
 }

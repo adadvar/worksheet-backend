@@ -18,14 +18,14 @@ class CartController extends Controller
     {
         $user = $r->user();
         $cart = $user->cart ?? $user->cart()->create();
-        $cart->load('cartItems.worksheet.grade', 'cartItems.worksheet.subject', 'cartItems.worksheet.topic');
+        $cart->load('cartItems.product.grade', 'cartItems.product.subject', 'cartItems.product.topic');
         $cart->cartItems->map(function ($cartItem) {
-            $worksheet = $cartItem->worksheet;
-            $cartItem->price = $worksheet->price;
+            $product = $cartItem->product;
+            $cartItem->price = $product->price;
             $cartItem->save();
         });
 
-        $cart->load('cartItems.worksheet.grade', 'cartItems.worksheet.subject', 'cartItems.worksheet.topic');
+        $cart->load('cartItems.product.grade', 'cartItems.product.subject', 'cartItems.product.topic');
         return response($cart);
     }
 
@@ -36,7 +36,7 @@ class CartController extends Controller
 
             $cart = $r->user()->cart;
 
-            $existingCartItem = $cart->cartItems()->where('worksheet_id', $r->worksheet_id)->first();
+            $existingCartItem = $cart->cartItems()->where('product_id', $r->product_id)->first();
 
             if ($existingCartItem) {
                 $existingCartItem->update([
@@ -44,7 +44,7 @@ class CartController extends Controller
                 ]);
             } else {
                 $cart->cartItems()->create([
-                    'worksheet_id' => $r->worksheet_id,
+                    'product_id' => $r->product_id,
                     'prev_price' => $r->price,
                     'price' => $r->price,
                 ]);
@@ -79,10 +79,10 @@ class CartController extends Controller
     {
         try {
             $cart = $r->user()->cart;
-            $worksheet = $r->worksheet;
+            $product = $r->product;
             $cartItem = CartItem::where([
                 'cart_id' => $cart->id,
-                'worksheet_id' => $worksheet->id,
+                'product_id' => $product->id,
             ])->first();
             if ($cartItem) {
                 $cartItem->delete();

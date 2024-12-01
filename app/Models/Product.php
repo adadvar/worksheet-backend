@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class Worksheet extends Model
+class Product extends Model
 {
     use HasFactory;
 
-    protected $table = 'worksheets';
+    protected $table = 'products';
     protected $fillable = [
+        'type',
         'grade_id',
         'subject_id',
         'topic_id',
@@ -24,6 +25,11 @@ class Worksheet extends Model
         'file_pdf',
         'publish_at'
     ];
+
+    const TYPE_WORKSHEET = 'worksheet';
+    const TYPE_TOOLS = 'tools';
+    const TYPE_HANDICRAFT = 'handicraft';
+    const TYPES = [self::TYPE_WORKSHEET, self::TYPE_TOOLS, self::TYPE_HANDICRAFT];
 
     protected $appends = ['age', 'views_count'];
 
@@ -95,15 +101,15 @@ class Worksheet extends Model
 
     public function getFilePdfLinkAttribute()
     {
-        if ($this->isPaid() && $this->file_pdf && Storage::disk('worksheets')->exists($this->file_pdf))
-            return Storage::disk('worksheets')->url($this->file_pdf);
+        if ($this->isPaid() && $this->file_pdf && Storage::disk('products')->exists($this->file_pdf))
+            return Storage::disk('products')->url($this->file_pdf);
         return null;
     }
 
     public function getFileWordLinkAttribute()
     {
-        if ($this->isPaid() && $this->file_word && Storage::disk('worksheets')->exists($this->file_word))
-            return Storage::disk('worksheets')->url($this->file_word);
+        if ($this->isPaid() && $this->file_word && Storage::disk('products')->exists($this->file_word))
+            return Storage::disk('products')->url($this->file_word);
         return null;
     }
 
@@ -119,7 +125,7 @@ class Worksheet extends Model
             return true;
         }
         if ($user) {
-            $orderItem = OrderItem::where('worksheet_id', $this->id)
+            $orderItem = OrderItem::where('product_id', $this->id)
                 ->whereHas('order', function ($query) use ($user) {
                     $query->where('user_id', $user->id)
                         ->where('status', Order::TYPE_PAID);
@@ -134,19 +140,19 @@ class Worksheet extends Model
     public function viewers()
     {
         return $this
-            ->belongsToMany(User::class, 'worksheet_views')
+            ->belongsToMany(User::class, 'product_views')
             ->withTimestamps();
     }
 
     public static function views($userId)
     {
-        return static::where('worksheets.user_id', $userId)
-            ->join('worksheet_views', 'worksheets.id', '=', 'worksheet_views.worksheet_id');
+        return static::where('products.user_id', $userId)
+            ->join('product_views', 'products.id', '=', 'product_views.product_id');
     }
 
     public function getViewsCountAttribute()
     {
-        return WorksheetView::where('worksheet_id', $this->id)->count();
+        return ProductView::where('product_id', $this->id)->count();
     }
 
     // public function getIsInCartAttribute()

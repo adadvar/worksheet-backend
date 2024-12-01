@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 
-class WorksheetDownloadRequest extends FormRequest
+class ProductLikeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +16,7 @@ class WorksheetDownloadRequest extends FormRequest
     public function authorize()
     {
         return Gate::forUser(auth('api')->user())
-            ->allows('download', $this->worksheet);
+            ->allows('like', $this->product);
     }
 
     /**

@@ -31,7 +31,7 @@ class OrderUpdateRequest extends FormRequest
             'status' => 'sometimes|required|in:' . implode(',', Order::TYPES),
             'items' => 'sometimes|required|array',
             'items.*.id' => 'sometimes|required|exists:order_items,id',
-            'items.*.worksheet_id' => 'sometimes|required|exists:worksheets,id',
+            'items.*.product_id' => 'sometimes|required|exists:products,id',
             'items.*.quantity' => 'nullable|integer',
             'items.*.price' => 'nullable|numeric',
         ];

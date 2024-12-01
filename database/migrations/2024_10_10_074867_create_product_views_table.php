@@ -11,23 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('worksheet_favourites', function (Blueprint $table) {
+        Schema::create('product_views', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('worksheet_id');
+            $table->unsignedBigInteger('product_id');
             $table->string('user_ip', 100)->nullable();
             $table->timestamps();
-            $table->softDeletes();
 
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('cascade')
+                ->onDelete('set null')
                 ->onUpdate('cascade');
 
-            $table->foreign('worksheet_id')
+            $table->foreign('product_id')
                 ->references('id')
-                ->on('worksheets')
+                ->on('products')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
@@ -38,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('worksheet_favourites');
+        Schema::dropIfExists('product_views');
     }
 };

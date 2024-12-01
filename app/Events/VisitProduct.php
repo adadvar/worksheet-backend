@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\Models\Worksheet;
+use App\Models\Product;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,18 +11,18 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class VisitWorksheet
+class VisitProduct
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    private $worksheet;
+    private $product;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Worksheet $worksheet)
+    public function __construct(Product $product)
     {
-        $this->worksheet = $worksheet;
+        $this->product = $product;
     }
 
     /**
@@ -38,10 +38,10 @@ class VisitWorksheet
     }
 
     /**
-     * @return Worksheet
+     * @return Product
      */
-    public function getWorksheet(): Worksheet
+    public function getProduct(): Product
     {
-        return $this->worksheet;
+        return $this->product;
     }
 }

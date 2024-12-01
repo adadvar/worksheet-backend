@@ -35,11 +35,11 @@ class OrderController extends Controller
 
         $cart = $user->cart;
         if ($cart && $cart->cartItems->isNotEmpty()) {
-            $cartItems = $cart->cartItems->keyBy('worksheet_id');
+            $cartItems = $cart->cartItems->keyBy('product_id');
 
             foreach ($order->orderItems as $orderItem) {
-                if (isset($cartItems[$orderItem->worksheet_id])) {
-                    $orderItem->price = $cartItems[$orderItem->worksheet_id]->price;
+                if (isset($cartItems[$orderItem->product_id])) {
+                    $orderItem->price = $cartItems[$orderItem->product_id]->price;
                     $orderItem->save();
                 }
             }
@@ -55,7 +55,7 @@ class OrderController extends Controller
     public function my(Request $r)
     {
         $user = $r->user();
-        $order = $user->orders()->whereNot('status', Order::TYPE_PENDING)->with('orderItems.worksheet.grade', 'orderItems.worksheet.subject', 'orderItems.worksheet.topic')->get();
+        $order = $user->orders()->whereNot('status', Order::TYPE_PENDING)->with('orderItems.product.grade', 'orderItems.product.subject', 'orderItems.product.topic')->get();
 
         return response($order);
     }
@@ -92,7 +92,7 @@ class OrderController extends Controller
             foreach ($cart->cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'worksheet_id' => $item->worksheet_id,
+                    'product_id' => $item->product_id,
                     'price' => $item->price,
                 ]);
             }
@@ -124,7 +124,7 @@ class OrderController extends Controller
      */
     public function show(OrderShowRequest $r)
     {
-        $order = $r->order->whereNot('status', Order::TYPE_PENDING)->with('orderItems.worksheet.grade', 'orderItems.worksheet.subject', 'orderItems.worksheet.topic')->first();
+        $order = $r->order->whereNot('status', Order::TYPE_PENDING)->with('orderItems.product.grade', 'orderItems.product.subject', 'orderItems.product.topic')->first();
         return response($order);
     }
 

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
-class WorksheetListRequest extends FormRequest
+class ProductDeleteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class WorksheetListRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('delete', $this->product);
     }
 
     /**

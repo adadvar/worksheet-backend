@@ -7,7 +7,7 @@ use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\User;
-use App\Models\Worksheet;
+use App\Models\Product;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -58,7 +58,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::model('user', User::class);
         Route::model('category', Category::class);
-        Route::model('worksheet', Worksheet::class);
+        Route::model('product', Product::class);
         Route::model('order', Order::class);
         Route::model('cart', Cart::class);
         Route::model('cartItem', CartItem::class);

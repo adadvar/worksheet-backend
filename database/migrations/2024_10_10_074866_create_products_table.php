@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,8 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('worksheets', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->enum('type', Product::TYPES)->default(Product::TYPE_WORKSHEET);
             $table->unsignedBigInteger('grade_id');
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('topic_id');
@@ -60,6 +62,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('worksheets');
+        Schema::dropIfExists('products');
     }
 };

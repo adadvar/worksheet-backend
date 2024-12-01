@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cart_items', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('cart_id');
-            $table->unsignedBigInteger('worksheet_id');
+            $table->unsignedBigInteger('product_id');
             $table->decimal('prev_price', 15, 2)->nullable();
             $table->decimal('price', 15, 2)->nullable();
             $table->timestamps();
@@ -25,9 +25,9 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->foreign('worksheet_id')
+            $table->foreign('product_id')
                 ->references('id')
-                ->on('worksheets')
+                ->on('products')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });

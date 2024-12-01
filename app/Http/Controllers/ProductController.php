@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\VisitWorksheet;
-use App\Http\Requests\Worksheet\UploadWorksheetBannersRequest;
-use App\Http\Requests\Worksheet\UploadWorksheetFileRequest;
+use App\Events\VisitProduct;
+use App\Http\Requests\Product\UploadProductBannersRequest;
+use App\Http\Requests\Product\UploadProductFileRequest;
 use Illuminate\Support\Str;
-use App\Http\Requests\Worksheet\WorksheetCreateRequest;
-use App\Http\Requests\Worksheet\WorksheetDeleteRequest;
-use App\Http\Requests\Worksheet\WorksheetDownloadRequest;
-use App\Http\Requests\Worksheet\WorksheetLikeRequest;
-use App\Http\Requests\Worksheet\WorksheetUnlikeRequest;
-use App\Http\Requests\Worksheet\WorksheetUpdateRequest;
+use App\Http\Requests\Product\ProductCreateRequest;
+use App\Http\Requests\Product\ProductDeleteRequest;
+use App\Http\Requests\Product\ProductDownloadRequest;
+use App\Http\Requests\Product\ProductLikeRequest;
+use App\Http\Requests\Product\ProductUnlikeRequest;
+use App\Http\Requests\Product\ProductUpdateRequest;
 use App\Models\Category;
-use App\Models\Worksheet;
-use App\Models\WorksheetFavourite;
+use App\Models\Product;
+use App\Models\ProductFavourite;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -25,20 +25,20 @@ use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\Settings;
 use Barryvdh\DomPDF\Facade as PDF;
 
-class WorksheetController extends Controller
+class ProductController extends Controller
 {
     public function list(Request $r)
     {
         $whereIns = [];
         $conditions = [];
-        $categoryRequests = null;
+        $categoryRequests = [];
 
         if ($r->param1) {
-            $categoryRequests = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
+            $categoryRequests[] = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
         }
 
         if ($r->param2) {
-            $categoryRequests = Category::where('slug', $r->param2)
+            $categoryRequests[] = Category::where('slug', $r->param2)
                 ->where(function ($query) use ($r) {
                     $query->whereHas('parent', function ($query) use ($r) {
                         $query->where('slug', $r->param1);
@@ -49,7 +49,7 @@ class WorksheetController extends Controller
         }
 
         if ($r->param3) {
-            $categoryRequests = Category::where(['type' => 'topic', 'slug' => $r->param3])
+            $categoryRequests[] = Category::where(['type' => 'topic', 'slug' => $r->param3])
                 ->whereHas('parent', function ($query) use ($r) {
                     $query->where('slug', $r->param2);
                 })
@@ -57,24 +57,23 @@ class WorksheetController extends Controller
                     $query->where('slug', $r->param1);
                 })->get();
         }
+        // if ($categoryRequests) {
+        //     $ids = [];
+        //     foreach ($categoryRequests as $categoryRequest) {
+        //         $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
+        //     }
+        //     $ids = array_unique($ids);
 
-        if ($categoryRequests) {
-            $ids = [];
-            foreach ($categoryRequests as $categoryRequest) {
-                $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
-            }
-            $ids = array_unique($ids);
-
-            $whereIns['grade_id'] = $ids;
-            $whereIns['subject_id'] = $ids;
-            $whereIns['topic_id'] = $ids;
-        }
+        //     $whereIns['grade_id'] = $ids;
+        //     $whereIns['subject_id'] = $ids;
+        //     $whereIns['topic_id'] = $ids;
+        // }
 
         // $prices = explode('-', $r->price);
         // if ($prices[0]) $conditions[] = ['price', '>=', $prices[0]];
         // if ($prices[1]) $conditions[] = ['price', '<=', $prices[1]];
 
-        $query = Worksheet::query();
+        $query = Product::query();
 
         if ($r->search) {
             $searchTerm = $r->search;
@@ -93,10 +92,25 @@ class WorksheetController extends Controller
             });
         }
 
+        if ($r->has('type') && $r->type !== 'all') $conditions[] = ['type', '=', $r->type];
         $query->where($conditions);
-        foreach ($whereIns as $column => $values) {
-            $query->orWhereIn($column, $values);
+        foreach ($categoryRequests as $index => $categoryRequest) {
+            if ($categoryRequest->isNotEmpty()) {
+                $column = match ($index) {
+                    0 => 'grade_id',
+                    1 => 'subject_id',
+                    2 => 'topic_id',
+                    default => null,
+                };
+                if ($column) {
+                    $query->whereIn($column, $categoryRequest->pluck('id')->toArray());
+                }
+            }
         }
+
+        // foreach ($whereIns as $column => $values) {
+        //     $query->orWhereIn($column, $values);
+        // }
 
         $query->with(['grade', 'subject', 'topic']);
         $query->withCount('viewers as views_count');
@@ -106,64 +120,63 @@ class WorksheetController extends Controller
         if ($r->sortBy === 'price-asc') $query->orderBy('price', 'asc');
         if ($r->sortBy === 'price-desc') $query->orderBy('price', 'desc');
 
-
         // if ($r->o == 'n' || $r->o == null) $query->orderBy('id', 'desc');
         // if ($r->o == 'pa') $query->orderBy('price', 'asc');
         // if ($r->o == 'pd') $query->orderBy('price', 'desc');
 
         $perPage = $r->per_page ?? 9;
-        $worksheets = $query->paginate($perPage);
+        $products = $query->paginate($perPage);
 
-        return response($worksheets);
+        return response($products);
     }
 
     public function show(Request $r)
     {
-        // $worksheet = Worksheet::where('slug_url', $r->id_slug)
+        // $product = Product::where('slug_url', $r->id_slug)
         //     ->orWhere('id', $r->id_slug)
         //     ->where('state', 'accepted')
         //     ->firstOrFail();
-        // event(new VisitWorksheet($worksheet));
-        // $worksheet = $worksheet->load('user', 'category');
+        // event(new VisitProduct($product));
+        // $product = $product->load('user', 'category');
 
-        $worksheet = $r->worksheet;
+        $product = $r->product;
 
-        if (!$worksheet) {
-            return response(['message' => 'Worksheet not found.'], 404);
+        if (!$product) {
+            return response(['message' => 'Product not found.'], 404);
         }
-        event(new VisitWorksheet($worksheet));
+        event(new VisitProduct($product));
 
-        $worksheet->load('grade', 'subject', 'topic');
-        $worksheetData = $r->worksheet->toArray();
+        $product->load('grade', 'subject', 'topic');
+        $productData = $r->product->toArray();
 
         $conditions = [
-            'worksheet_id' => $r->worksheet->id,
+            'product_id' => $r->product->id,
             'user_id' => auth('api')->check() ? auth('api')->id() : null,
         ];
 
         if (!auth('api')->check()) {
             $conditions['user_ip'] = client_ip();
         }
-        $worksheetData['liked'] = WorksheetFavourite::where($conditions)->count() > 0;
+        $productData['liked'] = ProductFavourite::where($conditions)->count() > 0;
 
         if (auth('api')->check()) {
-            $worksheetData['is_in_cart'] = $worksheet->cartItems()
+            $productData['is_in_cart'] = $product->cartItems()
                 ->where('cart_id', auth('api')->user()->cart->id)
                 ->exists();
         } else {
-            $worksheetData['is_in_cart'] = false;
+            $productData['is_in_cart'] = false;
         }
 
-        return $worksheetData;
+        return $productData;
     }
 
-    public static function uploadBanner(UploadWorksheetBannersRequest $r)
+    public static function uploadBanner(UploadProductBannersRequest $r)
     {
         try {
             $banner = $r->file('banner');
 
             $bannerName = time() . Str::random(10) . '-banner.' . $banner->getClientOriginalExtension();
-            // Storage::putFileAs('worksheets/tmp', $banner, $bannerName);
+            // Storage::putFileAs('products/tmp', $banner, $bannerName);
             Storage::disk('banners')->putFileAs('tmp', $banner, $bannerName);
 
             DB::table('temporary_files')->insert([
@@ -179,13 +192,13 @@ class WorksheetController extends Controller
         }
     }
 
-    public static function uploadFile(UploadWorksheetFileRequest $r)
+    public static function uploadFile(UploadProductFileRequest $r)
     {
         try {
             $file = $r->file('file');
             $fileName = time() . Str::random(10) . '-file.' . $file->getClientOriginalExtension();
-            // Storage::putFileAs('worksheets/tmp', $file, $fileName);
-            Storage::disk('worksheets')->putFileAs('tmp', $file, $fileName);
+            // Storage::putFileAs('products/tmp', $file, $fileName);
+            Storage::disk('products')->putFileAs('tmp', $file, $fileName);
 
             DB::table('temporary_files')->insert([
                 'file_name' => $fileName,
@@ -200,7 +213,7 @@ class WorksheetController extends Controller
         }
     }
 
-    public function create(WorksheetCreateRequest $r)
+    public function create(ProductCreateRequest $r)
     {
         try {
             DB::beginTransaction();
@@ -213,13 +226,13 @@ class WorksheetController extends Controller
                 $data['slug'] = $slug;
             }
 
-            $worksheet = Worksheet::create($data);
+            $product = Product::create($data);
 
             if ($r->has('banner') && !empty($r->banner)) {
                 $bannerName = $r->banner;
                 Storage::disk('banners')->move('tmp/' . $bannerName, $bannerName);
 
-                $worksheet->banner = $bannerName;
+                $product->banner = $bannerName;
 
                 DB::table('temporary_files')->where('file_name', $bannerName)->delete();
             }
@@ -228,9 +241,9 @@ class WorksheetController extends Controller
                 $fileName = $r->file_word;
                 $path = 'tmp/' . $fileName;
 
-                Storage::disk('worksheets')->move($path, $fileName);
+                Storage::disk('products')->move($path, $fileName);
 
-                $worksheet->file_word = $fileName;
+                $product->file_word = $fileName;
 
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
@@ -239,18 +252,18 @@ class WorksheetController extends Controller
                 $fileName = $r->file_pdf;
                 $path = 'tmp/' . $fileName;
 
-                Storage::disk('worksheets')->move($path, $fileName);
+                Storage::disk('products')->move($path, $fileName);
 
-                $worksheet->file_pdf = $fileName;
+                $product->file_pdf = $fileName;
 
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
-            $worksheet->save();
+            $product->save();
             DB::commit();
 
             return response(['message' => 'کاربرگ جدید ایجاد شد'], 201);
-            // return response($worksheet, 201);
+            // return response($product, 201);
         } catch (Exception $e) {
             DB::rollBack();
 
@@ -259,42 +272,42 @@ class WorksheetController extends Controller
         }
     }
 
-    public function update(WorksheetUpdateRequest $r)
+    public function update(ProductUpdateRequest $r)
     {
         try {
             DB::beginTransaction();
             $user = auth()->user();
             $data = $r->validated();
-            $worksheet = $r->worksheet;
+            $product = $r->product;
 
             if ($r->has('banner') && !empty($r->banner)) {
-                if ($worksheet->banner) {
-                    Storage::disk('banners')->delete($worksheet->banner);
+                if ($product->banner) {
+                    Storage::disk('banners')->delete($product->banner);
                 }
                 Storage::disk('banners')->move('tmp/' . $r->banner, $r->banner);
-                $worksheet->banner = $r->banner;
+                $product->banner = $r->banner;
                 DB::table('temporary_files')->where('file_name', $r->banner)->delete();
             }
 
             if ($r->has('file_word') && !empty($r->file_word)) {
                 $fileName = $r->file_word;
                 $path = 'tmp/' . $fileName;
-                if ($worksheet->file_word) {
-                    Storage::disk('worksheets')->delete($worksheet->file_word);
+                if ($product->file_word) {
+                    Storage::disk('products')->delete($product->file_word);
                 }
-                Storage::disk('worksheets')->move($path, $fileName);
-                $worksheet->file_word = $fileName;
+                Storage::disk('products')->move($path, $fileName);
+                $product->file_word = $fileName;
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
             if ($r->has('file_pdf') && !empty($r->file_pdf)) {
                 $fileName = $r->file_pdf;
                 $path = 'tmp/' . $fileName;
-                if ($worksheet->file_pdf) {
-                    Storage::disk('worksheets')->delete($worksheet->file_pdf);
+                if ($product->file_pdf) {
+                    Storage::disk('products')->delete($product->file_pdf);
                 }
-                Storage::disk('worksheets')->move($path, $fileName);
-                $worksheet->file_pdf = $fileName;
+                Storage::disk('products')->move($path, $fileName);
+                $product->file_pdf = $fileName;
                 DB::table('temporary_files')->where('file_name', $fileName)->delete();
             }
 
@@ -303,7 +316,7 @@ class WorksheetController extends Controller
                 $data['slug'] = $slug;
             }
 
-            $worksheet->update($data);
+            $product->update($data);
             DB::commit();
 
             return response(['message' => 'کاربرگ بروزرسانی شد'], 201);
@@ -315,23 +328,23 @@ class WorksheetController extends Controller
     }
 
 
-    public function delete(WorksheetDeleteRequest $r)
+    public function delete(ProductDeleteRequest $r)
     {
         try {
             DB::beginTransaction();
-            $worksheet = $r->worksheet;
-            if ($worksheet->banner) {
-                // Storage::delete('worksheets/' . $worksheet->banner);
-                // Storage::disk('worksheets')->delete($worksheet->banner);
-                Storage::disk('public')->delete('worksheets/' . $worksheet->banner);
+            $product = $r->product;
+            if ($product->banner) {
+                // Storage::delete('products/' . $product->banner);
+                // Storage::disk('products')->delete($product->banner);
+                Storage::disk('public')->delete('products/' . $product->banner);
             }
 
-            if ($worksheet->file_word) {
-                // Storage::delete('worksheets/' . $worksheet->file);
-                Storage::disk('worksheets')->delete($worksheet->file_word);
-                Storage::disk('worksheets')->delete($worksheet->file_pdf);
+            if ($product->file_word) {
+                // Storage::delete('products/' . $product->file);
+                Storage::disk('products')->delete($product->file_word);
+                Storage::disk('products')->delete($product->file_pdf);
             }
-            $worksheet->delete();
+            $product->delete();
             DB::commit();
 
             return response(['message' => 'با موفقیت حذف شد'], 200);
@@ -342,32 +355,32 @@ class WorksheetController extends Controller
         }
     }
 
-    public static function like(WorksheetLikeRequest $r)
+    public static function like(ProductLikeRequest $r)
     {
         $userId =  $r->user()->id;
-        $currentLikesCount = WorksheetFavourite::where('user_id', $userId)->count();
+        $currentLikesCount = ProductFavourite::where('user_id', $userId)->count();
         if ($currentLikesCount >= 30) {
-            WorksheetFavourite::where('user_id', $userId)
+            ProductFavourite::where('user_id', $userId)
                 ->orderBy('created_at', 'asc')
                 ->limit(1)
                 ->delete();
         }
-        //ابتدا باید وضعیت worksheet به accepted تغییر کند
-        WorksheetFavourite::create([
+        //ابتدا باید وضعیت product به accepted تغییر کند
+        ProductFavourite::create([
             // 'user_id' => Auth::guard('api')->id(),
             'user_id' => $userId,
             'user_ip' => client_ip(),
-            'worksheet_id' => $r->worksheet->id,
+            'product_id' => $r->product->id,
         ]);
 
         return response(['message' => 'به علاقه مندی ها اضافه شد'], 200);
     }
 
-    public static function unlike(WorksheetUnlikeRequest $r)
+    public static function unlike(ProductUnlikeRequest $r)
     {
         $user = auth('api')->user();
         $conditions = [
-            'worksheet_id' => $r->worksheet->id,
+            'product_id' => $r->product->id,
             'user_id' => $user ? $user->id : null
         ];
 
@@ -375,7 +388,7 @@ class WorksheetController extends Controller
             $conditions['user_ip'] = client_ip();
         }
 
-        WorksheetFavourite::where($conditions)->delete();
+        ProductFavourite::where($conditions)->delete();
         return response(['message' => 'از علاقه مندی ها حذف شد'], 200);
     }
 
@@ -385,15 +398,15 @@ class WorksheetController extends Controller
 
         $whereIns = [];
         $conditions = [];
-        $categoryRequests = null;
+        $categoryRequests = [];
 
         // فیلتر کردن بر اساس دسته‌بندی
         if ($r->param1) {
-            $categoryRequests = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
+            $categoryRequests[] = Category::where(['type' => 'grade', 'slug' => $r->param1])->get();
         }
 
         if ($r->param2) {
-            $categoryRequests = Category::where('slug', $r->param2)
+            $categoryRequests[] = Category::where('slug', $r->param2)
                 ->where(function ($query) use ($r) {
                     $query->whereHas('parent', function ($query) use ($r) {
                         $query->where('slug', $r->param1);
@@ -404,7 +417,7 @@ class WorksheetController extends Controller
         }
 
         if ($r->param3) {
-            $categoryRequests = Category::where(['type' => 'topic', 'slug' => $r->param3])
+            $categoryRequests[] = Category::where(['type' => 'topic', 'slug' => $r->param3])
                 ->whereHas('parent', function ($query) use ($r) {
                     $query->where('slug', $r->param2);
                 })
@@ -413,25 +426,43 @@ class WorksheetController extends Controller
                 })->get();
         }
 
-        if ($categoryRequests) {
-            $ids = [];
-            foreach ($categoryRequests as $categoryRequest) {
-                $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
-            }
-            $ids = array_unique($ids);
+        // if ($categoryRequests) {
+        //     $ids = [];
+        //     foreach ($categoryRequests as $categoryRequest) {
+        //         $ids = array_merge($ids, Category::extractChildrenIds($categoryRequest));
+        //     }
+        //     $ids = array_unique($ids);
 
-            $whereIns['grade_id'] = $ids;
-            $whereIns['subject_id'] = $ids;
-            $whereIns['topic_id'] = $ids;
+        //     $whereIns['grade_id'] = $ids;
+        //     $whereIns['subject_id'] = $ids;
+        //     $whereIns['topic_id'] = $ids;
+        // }
+
+        $query = $user->favouriteProducts();
+
+        if ($r->type && $r->type != 'all') $conditions[] = ['type', '=', $r->type];
+
+        $query->where($conditions);
+
+        // $query->where(function ($query) use ($whereIns) {
+        //     foreach ($whereIns as $column => $values) {
+        //         $query->orWhereIn($column, $values);
+        //     }
+        // });
+
+        foreach ($categoryRequests as $index => $categoryRequest) {
+            if ($categoryRequest->isNotEmpty()) {
+                $column = match ($index) {
+                    0 => 'grade_id',
+                    1 => 'subject_id',
+                    2 => 'topic_id',
+                    default => null,
+                };
+                if ($column) {
+                    $query->whereIn($column, $categoryRequest->pluck('id')->toArray());
+                }
+            }
         }
-
-        $query = $user->favouriteWorksheets();
-
-        $query->where(function ($query) use ($whereIns) {
-            foreach ($whereIns as $column => $values) {
-                $query->orWhereIn($column, $values);
-            }
-        });
 
         $query->with(['grade', 'subject', 'topic']);
         $query->withCount('viewers as views_count');
@@ -456,38 +487,38 @@ class WorksheetController extends Controller
         }
 
         $perPage = $r->per_page ?? 9;
-        $favouriteWorksheets = $query->paginate($perPage);
+        $favouriteProducts = $query->paginate($perPage);
 
-        return response($favouriteWorksheets);
+        return response($favouriteProducts);
     }
 
     public static function recents(Request $r)
     {
         $user = auth()->user();
-        return response($user->recentWorksheets);
+        return response($user->recentProducts);
     }
 
-    public function downloadPdf(WorksheetDownloadRequest $r)
+    public function downloadPdf(ProductDownloadRequest $r)
     {
-        $worksheet = $r->worksheet;
+        $product = $r->product;
 
-        $filePath = Storage::disk('worksheets')->path($worksheet->file_pdf);
-        $fileName = $worksheet->name . '.pdf';
+        $filePath = Storage::disk('products')->path($product->file_pdf);
+        $fileName = $product->name . '.pdf';
 
-        if (!Storage::disk('worksheets')->exists($worksheet->file_pdf))
+        if (!Storage::disk('products')->exists($product->file_pdf))
             return response()->json(['message' => 'فایل یافت نشد'], 404);
 
         return response()->download($filePath, $fileName,);
     }
 
-    public function downloadWord(WorksheetDownloadRequest $r)
+    public function downloadWord(ProductDownloadRequest $r)
     {
-        $worksheet = $r->worksheet;
+        $product = $r->product;
 
-        $filePath = Storage::disk('worksheets')->path($worksheet->file_word);
-        $fileName = $worksheet->name . '.docx';
+        $filePath = Storage::disk('products')->path($product->file_word);
+        $fileName = $product->name . '.docx';
 
-        if (!Storage::disk('worksheets')->exists($worksheet->file_pdf))
+        if (!Storage::disk('products')->exists($product->file_pdf))
             return response()->json(['message' => 'فایل یافت نشد'], 404);
 
         return response()->download($filePath, $fileName);
@@ -499,14 +530,14 @@ class WorksheetController extends Controller
         // $domPdfPath = base_path('vendor/dompdf/dompdf');
         // Settings::setPdfRendererPath($domPdfPath);
         // Settings::setPdfRendererName('DomPDF');
-        // $phpWord = IOFactory::load(Storage::disk('worksheets')->path($docxPath));
-        // dd(Storage::disk('worksheets')->path($docxPath));
+        // $phpWord = IOFactory::load(Storage::disk('products')->path($docxPath));
+        // dd(Storage::disk('products')->path($docxPath));
         // $pdfWriter = IOFactory::createWriter($phpWord, "PDF");
 
-        // $pdfWriter->save(Storage::disk('worksheets')->path($pdfPath));
+        // $pdfWriter->save(Storage::disk('products')->path($pdfPath));
 
         // Load the DOCX file
-        $phpWord = IOFactory::load(Storage::disk('worksheets')->path($docxPath));
+        $phpWord = IOFactory::load(Storage::disk('products')->path($docxPath));
 
         // Convert the DOCX to HTML
         $htmlContent = '';
@@ -534,6 +565,6 @@ class WorksheetController extends Controller
         $pdf->render();
 
         // Save the PDF to the specified path
-        Storage::disk('worksheets')->put($pdfPath, $pdf->output());
+        Storage::disk('products')->put($pdfPath, $pdf->output());
     }
 }

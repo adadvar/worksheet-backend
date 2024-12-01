@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('worksheet_recents', function (Blueprint $table) {
+        Schema::create('product_recents', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('worksheet_id');
+            $table->unsignedBigInteger('product_id');
             $table->timestamps();
 
             $table->foreign('user_id')
@@ -23,9 +23,9 @@ return new class extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->foreign('worksheet_id')
+            $table->foreign('product_id')
                 ->references('id')
-                ->on('worksheets')
+                ->on('products')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
         });
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('worksheet_recents');
+        Schema::dropIfExists('product_recents');
     }
 };

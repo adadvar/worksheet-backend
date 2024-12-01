@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Order;
 
 use App\Models\Order;
-use App\Rules\UploadedBannerWorksheetId;
-use App\Rules\UploadedFileWorksheetId;
+use App\Rules\UploadedBannerProductId;
+use App\Rules\UploadedFileProductId;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rules\In;

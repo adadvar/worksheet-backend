@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Requests\Worksheet;
+namespace App\Http\Requests\Product;
 
-use App\Models\Worksheet;
-use App\Rules\UploadedBannerWorksheetId;
-use App\Rules\UploadedFileWorksheetId;
+use App\Models\Product;
+use App\Rules\UploadedBannerProductId;
+use App\Rules\UploadedFileProductId;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rules\In;
 
-class   WorksheetCreateRequest extends FormRequest
+class ProductUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -17,8 +18,7 @@ class   WorksheetCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        //TODO محدودیت ایجاد که اگهی برای خود یوز یا ادمین باشد.
-        return Gate::allows('create', Worksheet::class);
+        return Gate::allows('update', $this->product);
     }
 
     /**
@@ -29,16 +29,16 @@ class   WorksheetCreateRequest extends FormRequest
     public function rules()
     {
         return [
+            'type' => ['nullable', new In(Product::TYPES)],
             'grade_id' => 'nullable|exists:categories,id',
             'subject_id' => 'nullable|exists:categories,id',
             'topic_id' => 'nullable|exists:categories,id',
             'name' => 'nullable|string|max:100',
-            'slug' => 'nullable|string|unique:worksheets,slug|max:100',
+            'slug' => 'nullable|string|unique:products,slug|max:100',
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|gt:0',
-            'banner' => ['nullable', new UploadedBannerWorksheetId()],
-            'file_word' => ['nullable', new UploadedFileWorksheetId()],
-            'file_pdf' => ['nullable', new UploadedFileWorksheetId()],
+            'banner' => ['nullable', new UploadedBannerProductId()],
+            'file' => ['nullable', new UploadedFileProductId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
         ];
     }

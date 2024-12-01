@@ -5,11 +5,11 @@ namespace App\Policies;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
-use App\Models\Worksheet;
-use App\Models\WorksheetFavourite;
+use App\Models\Product;
+use App\Models\ProductFavourite;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class WorksheetPolicy
+class ProductPolicy
 {
     use HandlesAuthorization;
 
@@ -28,47 +28,47 @@ class WorksheetPolicy
         return $user->isAdmin();
     }
 
-    public function update(User $user, Worksheet $worksheet = null)
+    public function update(User $user, Product $product = null)
     {
-        // return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        // return ($user->isAdmin() || ($user->id == $product->user_id));
         return $user->isAdmin();
     }
 
-    public function changeState(User $user, Worksheet $worksheet)
+    public function changeState(User $user, Product $product)
     {
         return $user->isAdmin();
     }
 
 
-    public function delete(User $user, Worksheet $worksheet = null)
+    public function delete(User $user, Product $product = null)
     {
-        // return ($user->isAdmin() || ($user->id == $worksheet->user_id));
+        // return ($user->isAdmin() || ($user->id == $product->user_id));
         return $user->isAdmin();
     }
 
-    public function like(User $user = null, Worksheet $worksheet = null)
+    public function like(User $user = null, Product $product = null)
     {
-        // if ($worksheet && $worksheet->isAccepted()) {
-        if ($worksheet) {
+        // if ($product && $product->isAccepted()) {
+        if ($product) {
             $conditions = [
-                'worksheet_id' => $worksheet->id,
+                'product_id' => $product->id,
                 'user_id' => $user ? $user->id : null
             ];
 
             if (empty($user)) {
                 $conditions['user_ip'] = client_ip();
             }
-            return WorksheetFavourite::where($conditions)->count() == 0;
+            return ProductFavourite::where($conditions)->count() == 0;
         }
 
         // return $this->deny('شما مجاز به این کار نیستید');
         return false;
     }
 
-    public function unlike(User $user = null, Worksheet $worksheet = null)
+    public function unlike(User $user = null, Product $product = null)
     {
         $conditions = [
-            'Worksheet_id' => $worksheet->id,
+            'Product_id' => $product->id,
             'user_id' => $user ? $user->id : null
         ];
 
@@ -76,10 +76,10 @@ class WorksheetPolicy
             $conditions['user_ip'] = client_ip();
         }
 
-        return WorksheetFavourite::where($conditions)->count();
+        return ProductFavourite::where($conditions)->count();
     }
 
-    public function download(User $user, Worksheet $worksheet)
+    public function download(User $user, Product $product)
     {
         // if (!$user) {
         //     return false;
@@ -90,7 +90,7 @@ class WorksheetPolicy
         }
 
         if ($user) {
-            $orderItem = OrderItem::where('worksheet_id', $worksheet->id)
+            $orderItem = OrderItem::where('product_id', $product->id)
                 ->whereHas('order', function ($query) use ($user) {
                     $query->where('user_id', $user->id)
                         ->where('status', Order::TYPE_PAID);
@@ -102,13 +102,13 @@ class WorksheetPolicy
         return false;
     }
 
-    // public function deleteFavourite(User $user = null, Worksheet $worksheet = null)
+    // public function deleteFavourite(User $user = null, Product $product = null)
     // {
-    //     return $user->favouriteWorksheets->find($worksheet->id);
+    //     return $user->favouriteProducts->find($product->id);
     // }
 
-    // public function deleteRecent(User $user = null, Worksheet $worksheet = null)
+    // public function deleteRecent(User $user = null, Product $product = null)
     // {
-    //     return $user->recentWorksheets->find($worksheet->id);
+    //     return $user->recentProducts->find($product->id);
     // }
 }

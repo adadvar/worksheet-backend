@@ -32,7 +32,7 @@ class CleanTemporaryFiles extends Command
             ->get();
 
         foreach ($files as $file) {
-            Storage::delete('worksheets/tmp/' . $file->file_name);
+            Storage::delete('products/tmp/' . $file->file_name);
             DB::table('temporary_files')->where('id', $file->id)->delete();
         }
 
