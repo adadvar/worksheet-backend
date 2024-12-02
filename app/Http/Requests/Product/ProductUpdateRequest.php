@@ -38,7 +38,8 @@ class ProductUpdateRequest extends FormRequest
             'description' => 'nullable|string',
             'price' => 'nullable|numeric|gt:0',
             'banner' => ['nullable', new UploadedBannerProductId()],
-            'file' => ['nullable', new UploadedFileProductId()],
+            'file_word' => ['nullable', new UploadedFileProductId()],
+            'file_pdf' => ['nullable', new UploadedFileProductId()],
             'publish_at' => 'nullable|date_format:Y-m-d H:i:s|after:now',
         ];
     }

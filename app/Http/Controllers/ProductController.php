@@ -159,13 +159,13 @@ class ProductController extends Controller
         }
         $productData['liked'] = ProductFavourite::where($conditions)->count() > 0;
 
-        if (auth('api')->check()) {
-            $productData['is_in_cart'] = $product->cartItems()
-                ->where('cart_id', auth('api')->user()->cart->id)
-                ->exists();
-        } else {
-            $productData['is_in_cart'] = false;
-        }
+        // if (auth('api')->check()) {
+        //     $productData['is_in_cart'] = $product->cartItems()
+        //         ->where('cart_id', auth('api')->user()->cart->id)
+        //         ->exists();
+        // } else {
+        //     $productData['is_in_cart'] = false;
+        // }
 
         return $productData;
     }

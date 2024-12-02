@@ -31,17 +31,25 @@ class Product extends Model
     const TYPE_HANDICRAFT = 'handicraft';
     const TYPES = [self::TYPE_WORKSHEET, self::TYPE_TOOLS, self::TYPE_HANDICRAFT];
 
-    protected $appends = ['age', 'views_count'];
+    protected $appends = [
+        'age',
+        'views_count',
+        'liked_count',
+        'is_in_cart',
+        'banner_link',
+        'file_pdf_link',
+        'file_word_link'
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
-    // protected $hidden = [
-    //     'file_word',
-    //     'file_pdf'
-    // ];
+    protected $hidden = [
+        'file_pdf_link',
+        'file_word_link'
+    ];
 
 
     // protected $casts = [
@@ -155,19 +163,27 @@ class Product extends Model
         return ProductView::where('product_id', $this->id)->count();
     }
 
-    // public function getIsInCartAttribute()
-    // {
-    //     return $this->cartItems()
-    //         ->where('cart_id', auth()->user()->cart->id)
-    //         ->exists();
-    // }
+    public function getLikedCountAttribute()
+    {
+        return ProductFavourite::where('product_id', $this->id)->count();
+    }
+
+    public function getIsInCartAttribute()
+    {
+        if (auth()->check() && auth()->user()->cart) {
+            return $this->cartItems()
+                ->where('cart_id', auth()->user()->cart->id)
+                ->exists();
+        }
+        return false;
+    }
 
     public function toArray()
     {
         $data = parent::toArray();
-        $data['banner_link'] = $this->banner_link;
-        $data['file_pdf_link'] = $this->file_pdf_link;
-        $data['file_word_link'] = $this->file_word_link;
+        // $data['banner_link'] = $this->banner_link;
+        // $data['file_pdf_link'] = $this->file_pdf_link;
+        // $data['file_word_link'] = $this->file_word_link;
         // $data['views_count'] = $this->views_count;
         // $data['is_in_cart'] = $this->is_in_cart;
 
