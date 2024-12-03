@@ -126,11 +126,15 @@ class AuthController extends Controller
         $user = User::where($field, $value)->whereNull('verified_at')->first();
 
         if (!empty($user)) {
-            $dateDiff = now()->diffInMinutes($user->updated_at);
+            $dateDiff = now()->diffInSeconds($user->updated_at);
 
             if ($dateDiff > config('auth.resend_verification_code_time_diff', 60)) {
                 $user->verify_code = random_verification_code();
                 $user->save();
+            } else {
+                return response([
+                    'message' => 'لطفا بعد از گذشت یک دقیقه تلاش کنید'
+                ], 500);
             }
 
 
@@ -142,7 +146,7 @@ class AuthController extends Controller
             }
 
             return response([
-                'message' => 'کد مجددا برای شما ارسال گردید.'
+                'message' => 'رمز یکبارمصرف برای شما ارسال گردید'
             ], 200);
         }
 
@@ -158,6 +162,7 @@ class AuthController extends Controller
         $value = $request->getFieldValue();
 
         $user = User::where($field, $value)->whereNotNull('verified_at')->first();
+
         if (!empty($user)) {
             $dateDiff = now()->diffInSeconds($user->updated_at);
 
