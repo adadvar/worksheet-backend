@@ -170,9 +170,9 @@ class Product extends Model
 
     public function getIsInCartAttribute()
     {
-        if (auth()->check() && auth()->user()->cart) {
+        if (auth('api')->check() && auth('api')->user()->cart) {
             return $this->cartItems()
-                ->where('cart_id', auth()->user()->cart->id)
+                ->where('cart_id', auth('api')->user()->cart->id)
                 ->exists();
         }
         return false;

@@ -52,21 +52,31 @@ class AuthController extends Controller
             DB::beginTransaction();
             $field = $request->getFieldName();
             $value = $request->getFieldValue();
+            $code = null;
             // اگر کاربر از قبل ثبت نام کرده باشد باید روال ثبت نام را قطع کنیم
             if ($user = User::where($field, $value)->first()) {
                 // اگر کاربر من ازقبل ثبت نام خودش رو کامل کرده باشه باید بهش خطا بدم
                 if ($user->verified_at) {
                     throw new UserAlreadyRegisteredException('شما قبلا ثبت نام کرده اید');
                 }
+                // return response(['message' => 'کد فعالسازی قبلا برای شما ارسال شده'], 400);
+                $dateDiff = now()->diffInSeconds($user->updated_at);
 
-                return response(['message' => 'کد فعالسازی قبلا برای شما ارسال شده'], 400);
+                if ($dateDiff > config('auth.resend_verification_code_time_diff', 60)) {
+                    $user->verify_code = random_verification_code();
+                    $user->save();
+                } else {
+                    return response([
+                        'message' => 'لطفا بعد از گذشت یک دقیقه تلاش کنید'
+                    ], 500);
+                }
+            } else {
+                $code = random_verification_code();
+                $user = User::create([
+                    $field => $value,
+                    'verify_code' => $code,
+                ]);
             }
-
-            $code = random_verification_code();
-            $user = User::create([
-                $field => $value,
-                'verify_code' => $code,
-            ]);
 
             Log::info('SEND-REGISTER-CODE-MESSAGE-TO-USER', ['code' => $code]);
 
