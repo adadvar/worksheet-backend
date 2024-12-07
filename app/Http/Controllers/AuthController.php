@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Ipe\Sdk\Facades\SmsIr;
 
 class AuthController extends Controller
 {
@@ -53,9 +54,7 @@ class AuthController extends Controller
             $field = $request->getFieldName();
             $value = $request->getFieldValue();
             $code = null;
-            // اگر کاربر از قبل ثبت نام کرده باشد باید روال ثبت نام را قطع کنیم
             if ($user = User::where($field, $value)->first()) {
-                // اگر کاربر من ازقبل ثبت نام خودش رو کامل کرده باشه باید بهش خطا بدم
                 if ($user->verified_at) {
                     throw new UserAlreadyRegisteredException('شما قبلا ثبت نام کرده اید');
                 }
@@ -80,12 +79,10 @@ class AuthController extends Controller
 
             Log::info('SEND-REGISTER-CODE-MESSAGE-TO-USER', ['code' => $code]);
 
-            if (!env('APP_DEBUG', true)) {
-                if ($request->getFieldName() === 'email') {
-                    Mail::to($user)->send(new VerificationCodeMail($code));
-                } else {
-                    // \Kavenegar::Send(config('kavenegar.sender'), $value, 'کد فعالسازی ' . $code);
-                }
+            if ($request->getFieldName() === 'email') {
+                Mail::to($user)->send(new VerificationCodeMail($code));
+            } else {
+                $this->sendSMS($value, $user->verify_code);
             }
 
             DB::commit();
@@ -153,6 +150,8 @@ class AuthController extends Controller
                 Mail::to($user)->send(new VerificationCodeMail($user->verify_code));
             } else {
                 // \Kavenegar::Send(config('kavenegar.sender'), $value, 'کد فعالسازی ' . $code);
+
+                $this->sendSMS($value, $user->verify_code);
             }
 
             return response([
@@ -191,6 +190,7 @@ class AuthController extends Controller
                 Mail::to($user)->send(new VerificationCodeMail($user->verify_code));
             } else {
                 // \Kavenegar::Send(config('kavenegar.sender'), $value, 'کد فعالسازی ' . $code);
+                $this->sendSMS($value, $user->verify_code);
             }
 
             return response([
@@ -225,6 +225,27 @@ class AuthController extends Controller
             return response(['user' => $user, 'token' => $token, 'message' => 'با موفقیت وارد شدید'], 200);
         } catch (Exception $exception) {
             Log::error($exception);
+            return response(
+                ['message' => 'خطایی رخ داده است'],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+
+    private function sendSMS($mobile, $code)
+    {
+        // return;
+        try {
+            $parameters = [
+                [
+                    "name" => "Code",
+                    "value" => $code
+                ]
+            ];
+            $templateId = 751976;
+            $response = SmsIr::verifySend($mobile, $templateId, $parameters);
+        } catch (Exception $exception) {
             return response(
                 ['message' => 'خطایی رخ داده است'],
                 Response::HTTP_INTERNAL_SERVER_ERROR

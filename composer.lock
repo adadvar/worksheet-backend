@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "69575ec0afee9bc93f2382d0c91ca0ed",
+    "content-hash": "193063760f80b9cc9e038478b8534bc2",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -1285,6 +1285,51 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "ipe/smsir-php",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/IPeCompany/smsir-php.git",
+                "reference": "a9c1bf0259541cc0f29317f36b868186ec5a03ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/IPeCompany/smsir-php/zipball/a9c1bf0259541cc0f29317f36b868186ec5a03ba",
+                "reference": "a9c1bf0259541cc0f29317f36b868186ec5a03ba",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.0",
+                "php": "^7.3|^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ipe\\Sdk\\SmsIrServiceProvider"
+                    ],
+                    "aliases": {
+                        "SmsIr": "Ipe\\Sdk\\Facades\\SmsIr"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ipe\\Sdk\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A package for sending SMS.",
+            "support": {
+                "issues": "https://github.com/IPeCompany/smsir-php/issues",
+                "source": "https://github.com/IPeCompany/smsir-php/tree/v1.0.1"
+            },
+            "time": "2024-10-19T05:20:03+00:00"
         },
         {
             "name": "laravel/framework",
