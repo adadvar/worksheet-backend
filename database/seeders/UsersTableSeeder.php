@@ -33,9 +33,9 @@ class UsersTableSeeder extends Seeder
     {
         $user = User::create([
             'name' => 'مدیر اصلی',
-            'password' => Hash::make('111111'),
-            'email' => 'admin@product.com',
-            'mobile' => '+989000000000',
+            'password' => Hash::make('1467757'),
+            'email' => 'info@bargiino.ir',
+            'mobile' => '+989305947825',
             'verified_at' => now()
         ]);
 
