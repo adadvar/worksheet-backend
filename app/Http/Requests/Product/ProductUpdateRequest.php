@@ -36,7 +36,7 @@ class ProductUpdateRequest extends FormRequest
             'name' => 'nullable|string|max:100',
             'slug' => 'nullable|string|unique:products,slug|max:100',
             'description' => 'nullable|string',
-            'price' => 'nullable|numeric|gt:0',
+            'price' => 'nullable|numeric|gte:0',
             'banner' => ['nullable', new UploadedBannerProductId()],
             'file_word' => ['nullable', new UploadedFileProductId()],
             'file_pdf' => ['nullable', new UploadedFileProductId()],

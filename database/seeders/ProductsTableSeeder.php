@@ -32,8 +32,8 @@ class ProductsTableSeeder extends Seeder
             ['grade_id' => 20, 'subject_id' => 24, 'topic_id' => 26, 'name' => 'کاربرگ12', 'slug' => 'karbarg12', 'description' => 'توضیحات کاربرگ12', 'price' => 20000, 'banner' => 'product12.jpg', 'file_pdf' => 'product12.pdf'],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
-        }
+        // foreach ($products as $product) {
+        //     Product::create($product);
+        // }
     }
 }
